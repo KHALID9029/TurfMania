@@ -3,6 +3,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import BackgroundCircles from "@/components/backgroundCircles";
 
 export default function HomePage() {
 
@@ -77,7 +78,8 @@ export default function HomePage() {
   }, [index, isDeleting, text]);
 
   return (
-    <main className="bg-black text-white font-sans">
+    <main className="bg-black text-white font-sans relative">
+      <BackgroundCircles/>
       {/* Navigation Bar */}
       <nav className="flex justify-between items-center px-10 py-5 border-b border-gray-800">
         <h1 className="text-2xl font-bold text-sky-400">TURFMANIA</h1>
@@ -104,7 +106,7 @@ export default function HomePage() {
           ].map((card, index) => (
             <div
             key={index}
-            className="relative w-64 h-48 rounded-xl overflow-hidden shadow-lg group"
+            className="relative w-90 h-130 rounded-xl overflow-hidden shadow-lg group"
             >
             {/* Background Image */}
             <Image
@@ -164,10 +166,10 @@ export default function HomePage() {
         <span className="animate-pulse text-white">|</span>
       </h3>
         <div className="flex justify-center gap-6">
-          <Link href="/register/player">
+          <Link href="/Registration/player">
             <button className="bg-cyan-500 hover:bg-sky-400 text-black font-medium px-5 py-2 rounded">Register as Player</button>
           </Link>
-          <Link href="/register/owner">
+          <Link href="/Registration/owner">
             <button className="bg-white text-black font-medium px-5 py-2 rounded hover:bg-gray-300">Register as Owner</button>
           </Link>
         </div>
