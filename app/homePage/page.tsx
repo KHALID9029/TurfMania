@@ -78,7 +78,7 @@ export default function HomePage() {
   }, [index, isDeleting, text]);
 
   return (
-    <main className="bg-black text-white font-sans relative">
+    <main className="bg-transparent text-white font-sans">
       <BackgroundCircles/>
       {/* Navigation Bar */}
       <nav className="flex justify-between items-center px-10 py-5 border-b border-gray-800">
