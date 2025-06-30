@@ -54,13 +54,13 @@ const LoginPage = () => {
                         <p className="text-sm text-gray-300 mb-4">Didn't Register yet?</p>
                         <div className="flex justify-center space-x-4">
                             <Link
-                                href="/Registration/player"
+                                href="/register/player"
                                 className="w-full px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition duration-200"
                             >
                                 Register as Player
                             </Link>
                             <Link
-                                href="/Registration/owner"
+                                href="/register/owner"
                                 className="w-full px-2 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 transition duration-200"
                             >
                                 Register as Owner
