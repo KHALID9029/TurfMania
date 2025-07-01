@@ -167,7 +167,7 @@ export default function HomePage() {
       </h3>
         <div className="flex justify-center gap-6">
           <Link href="/register/player">
-            <button className="bg-cyan-500 hover:bg-sky-400 text-black font-medium px-5 py-2 rounded">Register as Player</button>
+            <button className="bg-cyan-400 hover:bg-cyan-500 text-black font-medium px-5 py-2 rounded">Register as Player</button>
           </Link>
           <Link href="/register/owner">
             <button className="bg-white text-black font-medium px-5 py-2 rounded hover:bg-gray-300">Register as Owner</button>
