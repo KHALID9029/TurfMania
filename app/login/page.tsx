@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import BackgroundCircles from '@/components/backgroundCircles';
+import BackgroundCircles from '@/components/backgrounds/backgroundCircles';
 const LoginPage = () => {
     return (
         <div className=" min-h-screen bg-transparent flex items-center justify-center p-4">
