@@ -1,12 +1,11 @@
-export default interface PlayerDto {
-    _id: string;
-    firstName: string;
-    lastName: string;
+export default interface UserDto {
+    userId?: number; // Custom auto-increment field for public use
+    name: string;
     email: string;
-    phone: string;
-    nid: string;
+    phone?: string;
+    nid?: string;
     role: string;
-    street: string;
-    postCode: string;
-    city: string;
+    street?: string;
+    postCode?: string;
+    city?: string;
 }

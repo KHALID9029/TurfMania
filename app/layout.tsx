@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Toaster } from "react-hot-toast";
 import { Geist, Geist_Mono,Lexend_Mega } from "next/font/google";
 import "./globals.css";
 
@@ -33,6 +34,17 @@ export default function RootLayout({
         className={`${lexendMega.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <Toaster
+          // position="bottom-right"
+          // reverseOrder={false}
+          // toastOptions={{
+          //   className: "bg-gray-800 text-white",
+          //   style: {
+          //     fontFamily: "var(--font-geist-sans)",
+          //     fontSize: "14px",
+          //   },
+          // }}
+        />
       </body>
     </html>
   );

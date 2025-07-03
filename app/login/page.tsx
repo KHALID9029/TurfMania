@@ -1,12 +1,13 @@
 import React from 'react';
 import Link from 'next/link';
 import BackgroundCircles from '@/components/backgroundCircles';
+
 const LoginPage = () => {
     return (
         <div className=" min-h-screen bg-transparent flex items-center justify-center p-4">
             <BackgroundCircles />
             <div className='flex flex-col items-center space-y-4 '>
-                <h1 className="text-2xl font-bold text-center text-gray-300 mb-6"><span className='text-[#44B5E9]'>Welcome!</span> Let's Log In!</h1>
+                <h1 className="text-2xl font-bold text-center text-gray-300 mb-6"><span className='text-[#44B5E9]'>Welcome!</span> Let&apos;s Log In!</h1>
 
                 <div className="w-full max-w-md bg-black rounded-lg shadow-md p-8">
 
@@ -51,7 +52,7 @@ const LoginPage = () => {
 
 
                     <div className="mt-8 pt-6 text-center">
-                        <p className="text-sm text-gray-300 mb-4">Didn't Register yet?</p>
+                        <p className="text-sm text-gray-300 mb-4">Didn&apos;t Register yet?</p>
                         <div className="flex justify-center space-x-4">
                             <Link
                                 href="/register?role=Player"
