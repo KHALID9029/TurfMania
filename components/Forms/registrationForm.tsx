@@ -19,6 +19,7 @@ interface playerFormData{
 // Hudai diye rakhlam, pore lagle use korbe
 interface RegistrationFormProps {
     error?: string;
+    buttonclicked?: string;
 }
 
 export const RegistrationForm: FC<RegistrationFormProps> = (
