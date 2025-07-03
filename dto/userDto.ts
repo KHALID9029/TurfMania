@@ -1,5 +1,5 @@
 export default interface UserDto {
-    userId?: number; // Custom auto-increment field for public use
+    userId: number; // Custom auto-increment field for public use
     name: string;
     email: string;
     phone?: string;

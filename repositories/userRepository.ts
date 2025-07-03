@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
+
 import { connectDB } from "@/lib/mongoose";
 import User, {IUser} from "@/models/User";
 import { toUserDto } from "@/mapper/useMapper";
@@ -34,6 +36,22 @@ export async function getUserById(id: number){
     } catch (error) {
         console.error("Error fetching User:", error);
         return NextResponse.json({ error: "Failed to fetch User" }, { status: 500 });
+    }
+}
+
+
+export async function getUserByEmail(email: string) {
+    try {
+        await connectDB();
+        const user = await User.findOne({ email: email });
+        if (!user) {
+            return NextResponse.json({ error: "User not found" }, { status: 404 });
+        }
+        const userDto = toUserDto(user);
+        return NextResponse.json(userDto, { status: 200 });
+    } catch (error) {
+        console.error("Error fetching User by email:", error);
+        return NextResponse.json({ error: "Failed to fetch User by email" }, { status: 500 });
     }
 }
 
@@ -85,5 +103,28 @@ export async function deleteUser(id: number) {
     } catch (error) {
         console.error("Error deleting User:", error);
         return NextResponse.json({ error: "Failed to delete User" }, { status: 500 });
+    }
+}
+
+
+// Check the password for a user
+export async function passCheck(password: string, email: string) {
+    try {
+        await connectDB();
+        const user = await User.findOne({ email: email });
+        if (!user) {
+            return NextResponse.json({ error: "User not found" }, { status: 404 });
+        }
+        if (!user.password) {
+            return NextResponse.json({ error: "Password login unavailable for this account" }, { status: 403 });
+        }
+        const isPasswordCorrect = await bcrypt.compare(password, user.password);
+        if (!isPasswordCorrect) {
+            return NextResponse.json({ error: "Incorrect password" }, { status: 401 });
+        }
+        return NextResponse.json({ message: "Password is correct" }, { status: 200 });
+    } catch (error) {
+        console.error("Error checking password:", error);
+        return NextResponse.json({ error: "Failed to check password" }, { status: 500 });
     }
 }

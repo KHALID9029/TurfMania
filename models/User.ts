@@ -1,8 +1,8 @@
 import mongoose, {Schema, Document, model} from "mongoose";
-import { getNextUserSequence } from "@/lib/GetNextSequence";
+import { getNextSequence } from "@/lib/GetNextSequence";
 
 export interface IUser extends Document{
-    userId?: number; // Custom auto-increment field for public use
+    userId: number; // Custom auto-increment field for public use
     name: string;
     email: string;
     phone?: string;
@@ -32,7 +32,7 @@ const UserSchema: Schema = new Schema(
 
 UserSchema.pre<IUser>("save", async function(next) {
     if(!this.userId){
-        this.userId = await getNextUserSequence("userId");
+        this.userId = await getNextSequence("userId");
     }
     next();
 });

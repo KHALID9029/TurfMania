@@ -1,6 +1,6 @@
 import { Counter } from "@/models/counter";
 
-export const getNextUserSequence = async(name:string): Promise<number> => {
+export const getNextSequence = async(name:string): Promise<number> => {
     const updatedCounter = await Counter.findByIdAndUpdate(
         name,
         { $inc: { sequence_value: 1 } },

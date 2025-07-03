@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
+
 import UserDto from "@/dto/userDto";
 import {IUser} from "@/models/User";
 
 import {
     getAllUsers,
     getUserById,
+    getUserByEmail,
     postUser,
     putUser,
-    deleteUser
+    deleteUser,
+    passCheck
 } from "@/repositories/userRepository";
 
 export async function getAllUsersService(req: NextRequest) {
@@ -21,10 +25,17 @@ export async function getUserByIdService(id: number) {
     return getUserById(id);
 }
 
+export async function getUserByEmailService(email: string) {
+    if (!email) {
+        return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    }
+    return getUserByEmail(email);
+}
+
 export async function postUserService(User: IUser) {
 
-    if (!User || !User.name || !User.email || !User.phone || !User.nid) {
-        return NextResponse.json({ error: "Invalid User data" }, { status: 400 });
+    if(User.password){
+        User.password = await bcrypt.hash(User.password,12)
     }
 
     return postUser(User);
@@ -74,4 +85,13 @@ export async function deleteUserService(id: number) {
         return NextResponse.json({ error: "Failed to delete User" }, { status: 500 });
     }
     
+}
+
+
+// Check the password for a user
+export async function passCheckService(password: string, email: string) {
+    if(!password || !email)
+        return NextResponse.json({ error: "Password and user are required" }, { status: 400 });
+
+    return passCheck(password, email);
 }

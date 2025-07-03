@@ -4,7 +4,7 @@ import React, {FC, ReactElement, useState} from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 
-interface playerFormData{
+interface userFormData{
     name: string; 
     email: string;
     phone: string;
@@ -33,7 +33,7 @@ export const RegistrationForm: FC<RegistrationFormProps> = (
 
     const router = useRouter();
 
-    const [formData, setFormData] = useState<playerFormData>({
+    const [formData, setFormData] = useState<userFormData>({
         name: '',
         email: '',
         phone: '',
@@ -79,7 +79,9 @@ export const RegistrationForm: FC<RegistrationFormProps> = (
                 body:data,
             })
             if(!response.ok){
-                throw new Error('Failed to register player');
+                const errorData = await response.json();
+                toast.error(errorData?.error || 'Failed to register User')
+                throw new Error('Failed to register User');
             }else{
                 toast.success("Registration successful! Redirectiong to login page.....");
                 router.push('/login');

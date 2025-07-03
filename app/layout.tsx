@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Toaster } from "react-hot-toast";
 import { Geist, Geist_Mono,Lexend_Mega } from "next/font/google";
 import "./globals.css";
+import SessionWrapper from "./sessionWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,23 +30,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    <SessionWrapper>
+
     <html lang="en">
       <body
         className={`${lexendMega.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+        >
+        
+          {children}
+        
         <Toaster
-          // position="bottom-right"
+          position="bottom-right"
           // reverseOrder={false}
           // toastOptions={{
-          //   className: "bg-gray-800 text-white",
-          //   style: {
-          //     fontFamily: "var(--font-geist-sans)",
-          //     fontSize: "14px",
-          //   },
-          // }}
-        />
+            //   className: "bg-gray-800 text-white",
+            //   style: {
+              //     fontFamily: "var(--font-geist-sans)",
+              //     fontSize: "14px",
+              //   },
+              // }}
+              />
       </body>
     </html>
+    </SessionWrapper>
   );
 }

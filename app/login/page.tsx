@@ -1,10 +1,35 @@
+"use client"
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import React from 'react';
 import Link from 'next/link';
 import BackgroundCircles from '@/components/backgroundCircles';
 
-const LoginPage = () => {
-    return (
-        <div className=" min-h-screen bg-transparent flex items-center justify-center p-4">
+const SIgnInPage = () => {
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    const res = await signIn("credentials", {
+      redirect: false, // so we can handle manually
+      email,
+      password,
+    });
+    
+
+    if (res?.error) {
+      alert(res.error); // or better: setError state
+    } else {
+      router.push("/user/dashboard"); // or wherever you want after login
+    }
+  };
+
+  return (
+    <div className=" min-h-screen bg-transparent flex items-center justify-center p-4">
             <BackgroundCircles />
             <div className='flex flex-col items-center space-y-4 '>
                 <h1 className="text-2xl font-bold text-center text-gray-300 mb-6"><span className='text-[#44B5E9]'>Welcome!</span> Let&apos;s Log In!</h1>
@@ -12,7 +37,7 @@ const LoginPage = () => {
                 <div className="w-full max-w-md bg-black rounded-lg shadow-md p-8">
 
 
-                    <form className="space-y-6">
+                    <form className="space-y-6" onSubmit={handleSubmit}>
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                                 E-mail
@@ -20,8 +45,10 @@ const LoginPage = () => {
                             <input
                                 type="email"
                                 id="email"
+                                name="email"
                                 className="w-full border-0 border-b-2 border-gray-400 focus:outline-none focus:border-blue-500 bg-transparent"
                                 placeholder=""
+                                required
                             />
                         </div>
 
@@ -32,6 +59,7 @@ const LoginPage = () => {
                             <input
                                 type="password"
                                 id="password"
+                                name="password"
                                 className="w-full border-0 border-b-2 border-gray-400 focus:outline-none focus:border-blue-500 bg-transparent"
                                 placeholder=""
                             />
@@ -71,7 +99,8 @@ const LoginPage = () => {
                 </div>
             </div>
         </div>
-    );
+  );
 };
 
-export default LoginPage;
+
+export default SIgnInPage;
