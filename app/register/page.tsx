@@ -3,7 +3,7 @@ import React from 'react';
 import { useSearchParams } from 'next/navigation';
 
 import RegistrationForm from '@/components/Forms/registrationForm';
-import BackgroundCircles from '@/components/backgroundCircles';
+import BackgroundCircles from '@/components/backgrounds/backgroundCircles';
 
 const RegistrationPage = () => {
 

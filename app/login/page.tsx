@@ -3,7 +3,8 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React from 'react';
 import Link from 'next/link';
-import BackgroundCircles from '@/components/backgroundCircles';
+
+import BackgroundCircles from '@/components/backgrounds/backgroundCircles';
 
 const SIgnInPage = () => {
   const router = useRouter();

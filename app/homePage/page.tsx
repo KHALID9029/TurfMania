@@ -3,7 +3,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import BackgroundCircles from "@/components/backgroundCircles";
+import BackgroundCircles from "@/components/backgrounds/backgroundCircles";
 
 export default function HomePage() {
 
