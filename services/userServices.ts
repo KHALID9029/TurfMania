@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import PlayerDto from "@/dto/playerDto";
-import {IPlayer} from "@/models/Player";
+import PlayerDto from "@/dto/userDto";
+import {IUser} from "@/models/User";
 
 import {
     getAllPlayers,
@@ -8,7 +8,7 @@ import {
     postPlayer,
     putPlayer,
     deletePlayer
-} from "@/repositories/playerRepository";
+} from "@/repositories/userRepository";
 
 export async function getAllPlayersService(req: NextRequest) {
     return getAllPlayers(req);
@@ -21,7 +21,7 @@ export async function getPlayerByIdService(id: string) {
     return getPlayerById(id);
 }
 
-export async function postPlayerService(player: IPlayer) {
+export async function postPlayerService(player: IUser) {
 
     if (!player || !player.firstName || !player.lastName || !player.email || !player.phone || !player.nid) {
         return NextResponse.json({ error: "Invalid player data" }, { status: 400 });
@@ -32,7 +32,7 @@ export async function postPlayerService(player: IPlayer) {
 
 export async function putPlayerService(id: string, playerDto: PlayerDto) {
 
-    const updateData: Partial<IPlayer> = playerDto;
+    const updateData: Partial<IUser> = playerDto;
     
     try{
         const player = await getPlayerById(id);
@@ -43,7 +43,7 @@ export async function putPlayerService(id: string, playerDto: PlayerDto) {
 
         // Apply updates only to fields that are provided
         // Dynamically construct the update object and exclude undefined or _id fields
-        const updatePlayerData: Partial<IPlayer> = Object.fromEntries(
+        const updatePlayerData: Partial<IUser> = Object.fromEntries(
          Object.entries(updateData).filter(([key, value]) => key !== '_id' && value !== undefined && value !== null)
         );
 

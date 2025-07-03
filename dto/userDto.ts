@@ -5,6 +5,7 @@ export default interface PlayerDto {
     email: string;
     phone: string;
     nid: string;
+    role: string;
     street: string;
     postCode: string;
     city: string;

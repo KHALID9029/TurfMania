@@ -1,6 +1,6 @@
 import { connectDB } from "@/lib/mongoose";
 //import PlayerDto from "@/dto/playerDto";
-import Player, {IPlayer} from "@/models/Player";
+import Player, {IUser} from "@/models/User";
 import { NextRequest, NextResponse } from "next/server";
 
 /** GET: Fetches all players from the database**/
@@ -35,7 +35,7 @@ export async function getPlayerById(id: string){
 
 
 /** POST: Creates a new player in the database **/
-export async function postPlayer(player: IPlayer) {
+export async function postPlayer(player: IUser) {
     console.log("postPlayer called with player(repo):", player);
     try{
         await connectDB();
@@ -49,7 +49,7 @@ export async function postPlayer(player: IPlayer) {
 
 
 /** PUT: Updates an existing player in the database **/
-export async function putPlayer(id: string, updateData: Partial<IPlayer>) {
+export async function putPlayer(id: string, updateData: Partial<IUser>) {
     try {
         await connectDB();
         const updatedPlayer = await Player.findByIdAndUpdate(id, updateData, {
