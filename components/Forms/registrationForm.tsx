@@ -9,6 +9,7 @@ interface playerFormData{
     email: string;
     phone: string;
     nid: string;
+    role?: string; 
     password: string;
     confirmPassword?: string; // Optional, not used in submission
     street: string;
@@ -18,7 +19,9 @@ interface playerFormData{
 
 // Hudai diye rakhlam, pore lagle use korbe
 interface RegistrationFormProps {
+    role: string; 
     error?: string;
+    buttonclicked?: string;
 }
 
 export const RegistrationForm: FC<RegistrationFormProps> = (
@@ -36,6 +39,7 @@ export const RegistrationForm: FC<RegistrationFormProps> = (
         email: '',
         phone: '',
         nid: '',
+        role: props.role || 'Player', 
         password: '',
         confirmPassword: '',
         street: '',
@@ -66,12 +70,13 @@ export const RegistrationForm: FC<RegistrationFormProps> = (
             data.set('email', formData.email);
             data.set('phone', formData.phone);
             data.set('nid', formData.nid);
+            data.set('role', formData.role || 'Player');
             data.set('password', formData.password);
             data.set('street', formData.street);
             data.set('postCode', formData.postCode);
             data.set('city', formData.city);
 
-            const response = await fetch('/api/players', {
+            const response = await fetch('api/users', {
                 method: 'POST',
                 body:data,
             })

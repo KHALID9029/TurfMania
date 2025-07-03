@@ -166,10 +166,10 @@ export default function HomePage() {
         <span className="animate-pulse text-white">|</span>
       </h3>
         <div className="flex justify-center gap-6">
-          <Link href="/register/player">
+          <Link href="/register?role=Player">
             <button className="bg-cyan-400 hover:bg-cyan-500 text-black font-medium px-5 py-2 rounded">Register as Player</button>
           </Link>
-          <Link href="/register/owner">
+          <Link href="/register?role=Owner">
             <button className="bg-white text-black font-medium px-5 py-2 rounded hover:bg-gray-300">Register as Owner</button>
           </Link>
         </div>

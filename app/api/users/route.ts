@@ -1,4 +1,4 @@
-import { IPlayer } from '@/models/Player';
+import { IUser } from '@/models/User';
 import { NextRequest, NextResponse } from "next/server";
 
 import{
@@ -7,7 +7,7 @@ import{
     postPlayerService,
     putPlayerService,
     deletePlayerService
-} from "@/services/playerServices";
+} from "@/services/userServices";
 
 
 // Helper function to parse request to playerDto
@@ -20,6 +20,7 @@ async function parseRequestToPlayerDto(data: FormData) {
         email: data.get('email') as string,
         phone: data.get('phone') as string,
         nid: data.get('nid') as string,
+        role: data.get('role') as string || 'Player', // Default to 'Player' if not provided
         street: data.get('street') as string,
         postCode: data.get('postCode') as string,
         city: data.get('city') as string
@@ -32,6 +33,7 @@ async function parseRequestToPlayerDto(data: FormData) {
         email: body.email,
         phone: body.phone,
         nid: body.nid,
+        role: body.role,
         street: body.street,
         postCode: body.postCode,
         city: body.city
@@ -61,7 +63,7 @@ export async function POST(req: NextRequest){
     const data = await req.formData();
     //console.log(data);
     const playerDto = await parseRequestToPlayerDto(data);
-    const player = playerDto as IPlayer;
+    const player = playerDto as IUser;
     player.password = data.get('password') as string;
 
     //console.log("Parsed player DTO:", playerDto);
