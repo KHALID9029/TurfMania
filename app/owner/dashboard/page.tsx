@@ -1,8 +1,10 @@
 "use client"
 
-import Sidebar from "@/components/sidebar"
+import Sidebar from "@/components/bars/sidebar"
 import Head from "next/head"
 import TrueFocus from '@/components/truefocus';
+import Lightning from '@/components/backgrounds/lightingBackground';
+
 
 
 export default function Dashboard() {
@@ -12,12 +14,14 @@ export default function Dashboard() {
         <title>Owner Dashboard</title>
       </Head>
       <div className="flex min-h-screen bg-[#121212] text-white">
+    
         {/* Sidebar */}
         <Sidebar />
 
         {/* Main Content */}
-        <main className="flex-1 p-6 pt-16 md:p-6 ">
+        <main className="flex-1 p-6">
           {/* Cards Row */}
+          <h1 className="pb-5">DASHBOARD</h1>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
             {/* Book vs Cancels */}
             <div className="bg-[#1f1f1f] p-6 rounded-xl shadow-md">
@@ -87,7 +91,7 @@ export default function Dashboard() {
                 sentence="Earn More"
                 manualMode={false}
                 blurAmount={5}
-                borderColor="blue"
+                borderColor="#44B5E9"
                 animationDuration={1.5}
                 pauseBetweenAnimations={0.5}
               />
