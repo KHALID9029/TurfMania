@@ -2,10 +2,10 @@
 
 import React, {FC, ReactElement, useState} from 'react';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
-interface playerFormData{
-    firstName: string;
-    lastName: string;
+interface userFormData{
+    name: string; 
     email: string;
     phone: string;
     nid: string;
@@ -33,9 +33,8 @@ export const RegistrationForm: FC<RegistrationFormProps> = (
 
     const router = useRouter();
 
-    const [formData, setFormData] = useState<playerFormData>({
-        firstName: '',
-        lastName: '',
+    const [formData, setFormData] = useState<userFormData>({
+        name: '',
         email: '',
         phone: '',
         nid: '',
@@ -65,8 +64,7 @@ export const RegistrationForm: FC<RegistrationFormProps> = (
 
         try{
             const data = new FormData();
-            data.set('firstName', formData.firstName);
-            data.set('lastName', formData.lastName);
+            data.set('name', formData.name);
             data.set('email', formData.email);
             data.set('phone', formData.phone);
             data.set('nid', formData.nid);
@@ -81,8 +79,11 @@ export const RegistrationForm: FC<RegistrationFormProps> = (
                 body:data,
             })
             if(!response.ok){
-                throw new Error('Failed to register player');
+                const errorData = await response.json();
+                toast.error(errorData?.error || 'Failed to register User')
+                throw new Error('Failed to register User');
             }else{
+                toast.success("Registration successful! Redirectiong to login page.....");
                 router.push('/login');
             }
         }catch (error) {
@@ -94,43 +95,25 @@ export const RegistrationForm: FC<RegistrationFormProps> = (
     return (
         <div className="max-w-sm mx-auto p-4 bg-[#1e1e1e] rounded-lg shadow-md">
             <form className="space-y-3" onSubmit={handleSubmit}>
-                <div className="grid grid-cols-2 gap-3">
+                
                     <div>
                         <label
-                            htmlFor='firstName' 
+                            htmlFor='name' 
                             className="block text-xs font-medium text-gray-400"
                         >
-                            First Name
+                            Name
                         </label>
                         <input
                             type="text"
-                            id= "firstName"
-                            name="firstName"
-                            value={formData.firstName}
+                            id= "name"
+                            name="name"
+                            value={formData.name}
                             onChange={handleInputChange}
                             required
                             className="mt-1 block w-full text-sm bg-[#3B3939] text-white rounded-md shadow-sm py-1 px-2 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                         />
                     </div>
-
-                    <div>
-                        <label
-                            htmlFor='lastName' 
-                            className="block text-xs font-medium text-gray-400"
-                        >
-                            Last Name
-                        </label>
-                        <input
-                            type="text"
-                            id="lastName"
-                            name="lastName"
-                            value={formData.lastName}
-                            onChange={handleInputChange}
-                            required
-                            className="mt-1 block w-full text-sm bg-[#3B3939] text-white rounded-md shadow-sm py-1 px-2 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                        />
-                    </div>
-                </div>
+                
 
                 <div>
                     <label 

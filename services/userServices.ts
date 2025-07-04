@@ -1,80 +1,97 @@
 import { NextRequest, NextResponse } from "next/server";
-import PlayerDto from "@/dto/userDto";
+import bcrypt from "bcryptjs";
+
+import UserDto from "@/dto/userDto";
 import {IUser} from "@/models/User";
 
 import {
-    getAllPlayers,
-    getPlayerById,
-    postPlayer,
-    putPlayer,
-    deletePlayer
+    getAllUsers,
+    getUserById,
+    getUserByEmail,
+    postUser,
+    putUser,
+    deleteUser,
+    passCheck
 } from "@/repositories/userRepository";
 
-export async function getAllPlayersService(req: NextRequest) {
-    return getAllPlayers(req);
+export async function getAllUsersService(req: NextRequest) {
+    return getAllUsers(req);
 }
 
-export async function getPlayerByIdService(id: string) {
+export async function getUserByIdService(id: number) {
     if(!id) {
-        return NextResponse.json({ error: "Player ID is required" }, { status: 400 });
+        return NextResponse.json({ error: "User ID is required" }, { status: 400 });
     }
-    return getPlayerById(id);
+    return getUserById(id);
 }
 
-export async function postPlayerService(player: IUser) {
-
-    if (!player || !player.firstName || !player.lastName || !player.email || !player.phone || !player.nid) {
-        return NextResponse.json({ error: "Invalid player data" }, { status: 400 });
+export async function getUserByEmailService(email: string) {
+    if (!email) {
+        return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
-
-    return postPlayer(player);
+    return getUserByEmail(email);
 }
 
-export async function putPlayerService(id: string, playerDto: PlayerDto) {
+export async function postUserService(User: IUser) {
 
-    const updateData: Partial<IUser> = playerDto;
+    if(User.password){
+        User.password = await bcrypt.hash(User.password,12)
+    }
+
+    return postUser(User);
+}
+
+export async function putUserService(id: number, userDto: UserDto) {
+
+    const updateData: Partial<IUser> = userDto;
     
     try{
-        const player = await getPlayerById(id);
+        const user = await getUserById(id);
         
-        if (!player) {
-            return NextResponse.json({ error: "Player not found" }, { status: 404 });
+        if (!user) {
+            return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
         // Apply updates only to fields that are provided
         // Dynamically construct the update object and exclude undefined or _id fields
-        const updatePlayerData: Partial<IUser> = Object.fromEntries(
+        const updateUserData: Partial<IUser> = Object.fromEntries(
          Object.entries(updateData).filter(([key, value]) => key !== '_id' && value !== undefined && value !== null)
         );
 
-        return putPlayer(id, updatePlayerData);
+        return putUser(id, updateUserData);
     }catch (error) {
-        console.error("Error updating player:", error);
-        return NextResponse.json({ error: "Failed to update player" }, { status: 500 });
+        console.error("Error updating User:", error);
+        return NextResponse.json({ error: "Failed to update User" }, { status: 500 });
     }
 }
 
 
-export async function deletePlayerService(req: NextRequest) {
-    
-    const {searchParams} = new URL(req.url);
-    const id = searchParams.get('id');
+export async function deleteUserService(id: number) {
     
     if (!id) {
-        return NextResponse.json({ error: "Player ID is required" }, { status: 400 });
+        return NextResponse.json({ error: "User ID is required" }, { status: 400 });
     }
 
     try {
-        const player = await getPlayerById(id);
+        const user = await getUserById(id);
         
-        if (!player) {
-            return NextResponse.json({ error: "Player not found" }, { status: 404 });
+        if (!user) {
+            return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
-        return deletePlayer(id);
+        return deleteUser(id);
     } catch (error) {
-        console.error("Error deleting player:", error);
-        return NextResponse.json({ error: "Failed to delete player" }, { status: 500 });
+        console.error("Error deleting User:", error);
+        return NextResponse.json({ error: "Failed to delete User" }, { status: 500 });
     }
     
+}
+
+
+// Check the password for a user
+export async function passCheckService(password: string, email: string) {
+    if(!password || !email)
+        return NextResponse.json({ error: "Password and user are required" }, { status: 400 });
+
+    return passCheck(password, email);
 }
