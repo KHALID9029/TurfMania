@@ -3,11 +3,18 @@
 import Sidebar from "@/components/bars/sidebar"
 import Head from "next/head"
 import TrueFocus from '@/components/truefocus';
-import Lightning from '@/components/backgrounds/lightingBackground';
+//import Lightning from '@/components/backgrounds/lightingBackground';
+import { useRouter } from "next/navigation"
 
 
+const Dashboard=()=> {
 
-export default function Dashboard() {
+      const router = useRouter()
+  
+      const handleAddTurf = () => {
+          router.push("/owner/addTurf")
+      }
+
   return (
     <>
       <Head>
@@ -95,7 +102,9 @@ export default function Dashboard() {
                 animationDuration={1.5}
                 pauseBetweenAnimations={0.5}
               />
-            <button className="mt-6 px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-semibold text-base transition">
+            <button className="mt-6 px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-semibold text-base transition"
+            onClick={handleAddTurf}
+            >
               List your turf
             </button>
           </div>
@@ -104,3 +113,6 @@ export default function Dashboard() {
     </>
   )
 }
+
+
+export default Dashboard;

@@ -10,7 +10,8 @@ import {
   Menu,
   X,
   ChevronsLeft,
-  ChevronsRight
+  ChevronsRight,
+  UploadIcon
 } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
@@ -21,6 +22,7 @@ const navItems = [
   { name: "Dashboard", icon: <LayoutDashboard />, href: "/owner/dashboard" },
   { name: "My Turfs", icon: <MapPin />, href: "/owner/turfs" },
   { name: "Bookings", icon: <CalendarDays />, href: "/owner/bookings" },
+    { name: "List turf", icon: <UploadIcon />, href: "/owner/addTurf" },
 ]
 
 const others = [
@@ -58,8 +60,10 @@ const Sidebar = () => {
               {expanded ? <ChevronsLeft size={20} /> : <ChevronsRight size={20} />}
             </button>
           </div>
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-red-600 rounded-full" />
+          <div className="flex space-between items-center mb-6">
+            {/* <div className="w-16 h-16 bg-red-600 rounded-full" /> */}
+            <img src="/images/turf3.jpg" className={clsx(expanded && "md:w-20 md:h-20 bg-transparent rounded-full","w-12 h-12 bg-transparent rounded-full" )} />
+            {expanded && <h4 className="pl-2">Owner's Name</h4>}
           </div>
 
           <ul className="space-y-2 text-sm">
@@ -116,7 +120,7 @@ const Sidebar = () => {
       <div className="md:hidden absolute top-4 right-4 z-50">
         <button
           onClick={() => setMobileMenuOpen((prev) => !prev)}
-          className="bg-gray-800 text-white p-2 rounded-md"
+          className="bg-gray-800 text-white p-1 mt-2 rounded-md"
         >
           {mobileMenuOpen ? <X /> : <Menu />}
         </button>
