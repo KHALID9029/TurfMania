@@ -94,7 +94,15 @@ export default function Turf() {
 
             {/* Turf Cards */}
             <main className="flex-1 p-6  relative z-10 flex flex-col min-h-0">
-                <h1>MY TURFS</h1>
+                <div className="flex justify-between items-center pr-10 md:pr-0">
+                    <h1>MY TURFS</h1>
+                    <button
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-xl shadow-lg transition-all"
+                        onClick={handleAddTurf}
+                    >
+                        List Turf
+                    </button>
+                </div>
                 <div
                     className="custom-scrollbar grid grid-cols-1 md:grid-cols-2 mt-5 lg:grid-cols-3 gap-4 p-4 pt-4 pb-10 overflow-y-auto"
                     style={{ maxHeight: "90svh" }}
@@ -114,12 +122,7 @@ export default function Turf() {
             </main>
 
             {/* Floating CTA Button */}
-            <button
-                className="fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl shadow-lg transition-all"
-                onClick={handleAddTurf}
-            >
-                List Turf
-            </button>
+
         </div>
     )
 }
