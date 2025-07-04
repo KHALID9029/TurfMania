@@ -3,9 +3,15 @@
 import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+
 import BackgroundCircles from "@/components/backgrounds/backgroundCircles";
+import { Bell } from "lucide-react";
 
 export default function HomePage() {
+
+    // Session data
+    const { data: session } = useSession();
 
     const [activePage, setActivePage] = useState("Home");
 
@@ -81,8 +87,8 @@ export default function HomePage() {
     <main className="bg-transparent text-white font-sans">
       <BackgroundCircles/>
       {/* Navigation Bar */}
-      <nav className="flex justify-between items-center px-10 py-5 border-b border-gray-800">
-        <h1 className="text-2xl font-bold text-sky-400">TURFMANIA</h1>
+      <nav className="flex justify-center items-center px-10 py-5 border-b border-gray-800">
+        <h1 className="text-2xl font-bold text-sky-400 absolute left-8">TURFMANIA</h1>
         <ul className="hidden md:flex space-x-8 text-sm">
           <li><Link href="#" className={activePage=="Home"? "text-cyan-400 [text-shadow:0_0_5px_#22d3ee,0_0_10px_#22d3ee,0_0_20px_#22d3ee]": "hover:text-cyan-400"}>Home</Link></li>
           <li><Link href="/browse" className="hover:text-cyan-400">Turfs</Link></li>
@@ -90,11 +96,21 @@ export default function HomePage() {
           <li><Link href="/about" className="hover:text-cyan-400">About Us</Link></li>
           <li><Link href="/contact" className="hover:text-cyan-400">Contact us</Link></li>
         </ul>
+        {
+          session &&
+        <Link href="/player/notifications" className="absolute right-10">
+          <Bell/>
+        </Link>
+        }
+        {
+          !session &&
         <Link href="/login">
-          <button className="bg-cyan-400 hover:bg-cyan-500 px-5 py-1 rounded-full font-semibold text-black text-sm">
+          <button className="bg-cyan-400 hover:bg-cyan-500 px-5 py-1 rounded-full font-semibold text-black text-sm absolute right-10">
             LOGIN
           </button>
         </Link>
+        }
+        
       </nav>
 
       {/* Feature Cards */}
