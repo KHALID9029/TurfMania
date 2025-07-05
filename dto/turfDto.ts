@@ -1,5 +1,6 @@
 
 export default interface TurfDto {
+  turfId: number;
   turfName: string;
   ownerId: number;
   photos?: string[];
@@ -13,5 +14,4 @@ export default interface TurfDto {
   rate: number;
   lat: number;
   lng: number;
-
 }

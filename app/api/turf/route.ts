@@ -15,7 +15,7 @@ async function parseRequestToTurfDto(data: FormData) {
   const body = {
     turfId: parseInt(data.get('turfId') as string) || 0,
     turfName: data.get('turfName') as string,
-    ownerId: parseInt(data.get('ownerId') as string),
+    ownerId: parseInt(data.get('ownerId') as string || '0'),
     photos: data.get('photos')
       ? JSON.parse(data.get('photos') as string) as string[]
       : [],
@@ -25,20 +25,12 @@ async function parseRequestToTurfDto(data: FormData) {
     amenities: data.get('amenities')
       ? JSON.parse(data.get('amenities') as string) as string[]
       : [],
-    operatingHours: {
-      from: data.get('operatingHours.from')
-        ? JSON.parse(data.get('operatingHours.from') as string)
-        : { hour: '', minute: '', period: 'AM' },
-      to: data.get('operatingHours.to')
-        ? JSON.parse(data.get('operatingHours.to') as string)
-        : { hour: '', minute: '', period: 'AM' }
-    },
+    open: data.get('open') as string,
+    close: data.get('close') as string,
     turfSize: parseFloat(data.get('turfSize') as string),
     rate: parseFloat(data.get('rate') as string),
-    location: {
-      lat: parseFloat(data.get('lat') as string),
-      lng: parseFloat(data.get('lng') as string),
-    }
+    lat: parseFloat(data.get('lat') as string),
+    lng: parseFloat(data.get('lng') as string),
   };
 
   return {
@@ -50,10 +42,12 @@ async function parseRequestToTurfDto(data: FormData) {
     postCode: body.postCode,
     city: body.city,
     amenities: body.amenities,
-    operatingHours: body.operatingHours,
+    open: body.open,
+    close: body.close,
     turfSize: body.turfSize,
     rate: body.rate,
-    location: body.location
+    lat: body.lat,
+    lng: body.lng
   };
 }
 

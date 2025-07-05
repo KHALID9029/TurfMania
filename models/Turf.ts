@@ -24,18 +24,18 @@ const TurfSchema: Schema = new Schema(
   {
     turfId: { type: Number, unique: true }, // Unique identifier for the turf
     turfName: { type: String, required: true },
+    ownerId: { type: Number, required: true, ref: 'User' }, // Reference to the owner's user ID
+    photos: { type: [String], required: false },
     street: { type: String, required: true },
     postCode: { type: String, required: true },
     city: { type: String, required: true },
-    ownerId: { type: Number, required: true, ref: 'User' }, // Reference to the owner's user ID
-    photos: { type: [String], required: false },
+    amenities: { type: [String], required: false }, // List of amenity names
     open: { type: String, required: true },
     close: { type: String, required: true },
-    lat: { type: Number, required: true },
-    lng: { type: Number, required: true },
-    amenities: { type: [String], required: false }, // List of amenity names
     turfSize: { type: Number, required: true }, // e.g., "5-a-side", "7-a-side"
-    rate: { type: Number, required: true } // price per hour or slot
+    rate: { type: Number, required: true }, // price per hour or slot
+    lat: { type: Number, required: true },
+    lng: { type: Number, required: true }
   }
 );
 

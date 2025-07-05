@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
-
 import { connectDB } from "@/lib/mongoose";
 import Turf, {ITurf} from "@/models/Turf";
 import { toTurfDto } from "@/mapper/turfMapper";

@@ -1,7 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
-
-import TurfDto from "@/dto/turfDto";
 import { ITurf } from "@/models/Turf";
 
 import {
