@@ -15,7 +15,7 @@ async function parseRequestToTurfDto(data: FormData) {
   const body = {
     turfId: parseInt(data.get('turfId') as string) || 0,
     turfName: data.get('turfName') as string,
-    ownerId: parseInt(data.get('ownerId') as string || '0'),
+    ownerId: parseInt(data.get('ownerId') as string),
     photos: data.get('photos')
       ? JSON.parse(data.get('photos') as string) as string[]
       : [],
