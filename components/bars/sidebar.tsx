@@ -1,5 +1,11 @@
 "use client"
 
+import { usePathname } from "next/navigation"
+import Link from "next/link"
+import clsx from "clsx"
+import { useState } from "react"
+import { useSession } from "next-auth/react"
+import { signOut } from "next-auth/react";
 import {
   LayoutDashboard,
   MapPin,
@@ -13,11 +19,8 @@ import {
   ChevronsRight,
   UploadIcon
 } from "lucide-react"
-import { usePathname, useRouter } from "next/navigation"
-import Link from "next/link"
-import clsx from "clsx"
-import { useState, useEffect } from "react"
-import { useSession } from "next-auth/react"
+
+
 const navItems = [
   { name: "Dashboard", icon: <LayoutDashboard />, href: "/owner/dashboard" },
   { name: "My Turfs", icon: <MapPin />, href: "/owner/turfs" },
@@ -32,15 +35,9 @@ const others = [
 
 const Sidebar = () => {
   const pathname = usePathname()
-  const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [expanded, setExpanded] = useState(true)
-  const { data: session, status } = useSession()
-
-  const handleLogout = () => {
-    alert("Logged out!")
-    router.push("/homePage")
-  }
+  const { data: session } = useSession()
 
   return (
     <>
@@ -109,7 +106,7 @@ const Sidebar = () => {
         </div>
 
         <button
-          onClick={handleLogout}
+          onClick={() => signOut({ callbackUrl: "/homePage" })}
           className="flex items-center justify-center w-full bg-red-600 text-white rounded-md py-2 font-bold hover:bg-red-700 transition"
         >
           <LogOut className="mr-2" size={16} />
@@ -146,7 +143,7 @@ const Sidebar = () => {
               ))}
               <li className="border-t border-gray-600 mt-2">
                 <button
-                  onClick={handleLogout}
+                  onClick={() => signOut({ callbackUrl: "/homePage" })}
                   className="w-full flex items-center px-4 py-2 text-left text-red-400 hover:bg-gray-700 space-x-2"
                 >
                   <LogOut size={16} />

@@ -5,7 +5,6 @@ import Head from "next/head"
 import TrueFocus from '@/components/truefocus';
 //import Lightning from '@/components/backgrounds/lightingBackground';
 import { useRouter } from "next/navigation"
-import { useSession } from "next-auth/react";
 
 const Dashboard=()=> {
 
@@ -14,11 +13,11 @@ const Dashboard=()=> {
       const handleAddTurf = () => {
           router.push("/owner/addTurf")
       }
-const { data: session, status } = useSession();
+
   return (
     <>
       <Head>
-        <title>session.usernam</title>
+        <title>session.username</title>
       </Head>
       <div className="flex min-h-screen bg-[#121212] text-white">
     
