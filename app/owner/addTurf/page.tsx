@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import dynamic from 'next/dynamic';
 import { useSession } from "next-auth/react"
+import toast from "react-hot-toast";
 
 
 const MapSelector = dynamic(() => import('@/components/mapSelector'), { ssr: false });
@@ -110,10 +111,51 @@ export default function AddTurf() {
     };
 
 
-    const handleSubmit = () => {
-        // Handle form submission
-        console.log('Form submitted:', formData)
-    }
+    // const handleSubmit = () => {
+    //     // Handle form submission
+    //     console.log('Form submitted:', formData)
+    // }
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        try {
+            const data = new FormData();
+            data.set('turfName', formData.turfName);
+            data.set('ownerId', String(formData.ownerId)); // convert number to string
+            data.set('street', formData.street);
+            data.set('postCode', formData.postCode);
+            data.set('city', formData.city);
+            data.set('open', formData.open);
+            data.set('close', formData.close);
+            data.set('turfSize', String(formData.turfSize));
+            data.set('rate', String(formData.rate));
+            data.set('lat', String(formData.lat));
+            data.set('lng', String(formData.lng));
+
+            // For array-type field like amenities
+            formData.amenities?.forEach((amenity, index) => {
+                data.append(`amenities[${index}]`, amenity);
+            });
+
+            const response = await fetch('/api/turf', {
+                method: 'POST',
+                body: data,
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                toast.error(errorData?.error || 'Failed to register turf');
+                throw new Error('Failed to register turf');
+            } else {
+                toast.success('Turf registered successfully! Redirecting...');
+                router.push('dashboard'); // or wherever you want to go
+            }
+        } catch (error) {
+            console.error('Turf registration error:', error);
+            toast.error('An unexpected error occurred');
+        }
+    };
 
     useEffect(() => {
         console.log("Latest formData:", formData);
