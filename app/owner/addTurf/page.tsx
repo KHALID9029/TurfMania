@@ -2,79 +2,91 @@
 
 import Sidebar from "@/components/bars/sidebar"
 import Head from "next/head"
-import TrueFocus from '@/components/truefocus';
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import dynamic from 'next/dynamic';
+import { useSession } from "next-auth/react"
+
+
+const MapSelector = dynamic(() => import('@/components/mapSelector'), { ssr: false });
 
 export default function AddTurf() {
     const router = useRouter()
 
-    interface OperatingHour {
-        hour: string;
-        minute: string;
-        period: 'AM' | 'PM';
-    }
+    const { data: session, status } = useSession()
+    // TODO: Get session from context or props if needed
+    // Example: const { data: session } = useSession();
+
 
     interface FormData {
         turfName: string;
-        turfAddress: string;
+        ownerId: number;
+        photos?: string[];
         street: string;
         postCode: string;
         city: string;
-        turfDetails: string;
-        amenities: string[];
-        operatingHours: {
-            from: OperatingHour;
-            to: OperatingHour;
-        };
-        turfSize: string;
-        rate: string;
+        amenities?: string[];
+        open: string;  // e.g., "06:00 AM"
+        close: string; // e.g., "10:00 PM"
+        turfSize: number;
+        rate: number;
+
+        lat: number;
+        lng: number;
+
     }
+
 
     const [formData, setFormData] = useState<FormData>({
         turfName: '',
-        turfAddress: '',
+        ownerId: session?.user.userId as number,
         street: '',
         postCode: '',
         city: '',
-        turfDetails: '',
         amenities: [],
-        operatingHours: {
-            from: { hour: '06', minute: '00', period: 'AM' },
-            to: { hour: '06', minute: '00', period: 'PM' }
-        },
-        turfSize: '',
-        rate: ''
-    })
+        open: '06:00 AM',
+        close: '10:00 PM',
+        turfSize: 0,
+        rate: 0,
 
-    interface OperatingHour {
-        hour: string;
-        minute: string;
-        period: 'AM' | 'PM';
-    }
+        lat: 23.8103,
+        lng: 90.4125,
 
-    interface FormData {
-        turfName: string;
-        turfAddress: string;
-        street: string;
-        postCode: string;
-        city: string;
-        turfDetails: string;
-        amenities: string[];
-        operatingHours: {
-            from: OperatingHour;
-            to: OperatingHour;
-        };
-        turfSize: string;
-        rate: string;
-    }
+    });
+
+
+    const amenityArray = [
+        'Washroom',
+        'Locker',
+        'Parking',
+        'Wi-Fi',
+        'Changing Room',
+        'First Aid Kit',
+        'Drinking Water',
+        'Seating Area',
+        'Cafeteria',
+        'Shower',
+        'Lighting (Night Play)',
+        'Scoreboard',
+        'Sound System',
+        'CCTV Security',
+        'Covered Roof',
+        'Shoe Rental',
+        'Equipment Rental',
+        'Air Conditioning',
+    ];
+
 
     const handleInputChange = (field: keyof FormData, value: string) => {
         setFormData((prev: FormData) => ({
             ...prev,
             [field]: value
         }))
+
+
     }
+
+
 
     interface AmenityToggleHandler {
         (amenity: string): void;
@@ -83,33 +95,30 @@ export default function AddTurf() {
     const handleAmenityToggle: AmenityToggleHandler = (amenity) => {
         setFormData((prev: FormData) => ({
             ...prev,
-            amenities: prev.amenities.includes(amenity)
-                ? prev.amenities.filter((a: string) => a !== amenity)
-                : [...prev.amenities, amenity]
+            amenities: (prev.amenities ?? []).includes(amenity)
+                ? (prev.amenities ?? []).filter((a: string) => a !== amenity)
+                : [...(prev.amenities ?? []), amenity]
         }))
     }
 
-    interface HandleTimeChange {
-        (type: 'from' | 'to', field: keyof OperatingHour, value: string): void;
-    }
-
-    const handleTimeChange: HandleTimeChange = (type, field, value) => {
-        setFormData((prev: FormData) => ({
+    const handleTimeChange = (field: 'open' | 'close', hour: string, minute: string, period: 'AM' | 'PM') => {
+        const formatted = `${hour}:${minute} ${period}`;
+        setFormData(prev => ({
             ...prev,
-            operatingHours: {
-                ...prev.operatingHours,
-                [type]: {
-                    ...prev.operatingHours[type],
-                    [field]: value
-                }
-            }
-        }))
-    }
+            [field]: formatted
+        }));
+    };
+
 
     const handleSubmit = () => {
         // Handle form submission
         console.log('Form submitted:', formData)
     }
+
+    useEffect(() => {
+        console.log("Latest formData:", formData);
+    }, [formData]);
+
 
     return (
         <>
@@ -139,7 +148,7 @@ export default function AddTurf() {
                             />
                         </div>
                         <h1 className="block text-lg font-medium mb-2">Turf Address</h1>
-                        <hr/>
+                        <hr />
                         {/* Turf Address */}
                         <div>
                             <label className="block text-sm font-medium mb-2">Street</label>
@@ -176,30 +185,30 @@ export default function AddTurf() {
                             </div>
                         </div>
 
+
                         {/* Select on map */}
+                        {/* Select on map (with interactive Google Map) */}
+
                         <div>
                             <label className="block text-sm font-medium mb-2">Select on map</label>
-                            <div className="relative">
-                                <div className="w-full h-48 bg-[#2a2a2a] border border-gray-600 rounded-lg flex items-center justify-center">
-                                    <div className="text-center">
-                                        <div className="w-16 h-16 bg-gray-600 rounded-lg mx-auto mb-2 flex items-center justify-center">
-                                            <span className="text-2xl">📍</span>
-                                        </div>
-                                        <p className="text-sm text-gray-400">Click on the map to select location</p>
-                                    </div>
-                                </div>
-                                <div className="absolute top-4 right-4 bg-black bg-opacity-50 p-2 rounded text-xs">
-                                    <p>Click on the map to</p>
-                                    <p>place a pin and</p>
-                                    <p>your turf more</p>
-                                    <p>visible</p>
-                                </div>
+                            <div className="relative rounded-lg border-none overflow-hidden">
+                                <MapSelector
+                                    lat={formData.lat}
+                                    lng={formData.lng}
+                                    onLocationSelect={(lat, lng) =>
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            location: { lat, lng },
+                                        }))
+                                    }
+                                />
                             </div>
                         </div>
 
+
                         {/* Turf Details */}
                         <div>
-                        
+
                             <label className="block text-sm font-medium mb-2">Turf Details</label>
                             <p className="text-xs text-gray-400 mb-2">Upload at least 3 photos of the turf</p>
                             <div className="w-full h-32 bg-[#2a2a2a] border border-gray-600 rounded-lg flex items-center justify-center border-dashed">
@@ -214,12 +223,12 @@ export default function AddTurf() {
                         {/* Amenities */}
                         <div>
                             <label className="block text-sm font-medium mb-2">Amenities the turf provides:</label>
-                            <div className="flex gap-2 mb-4">
-                                {['Washroom', 'Locker', 'Parking'].map((amenity) => (
+                            <div className="flex flex-wrap gap-2 mb-4">
+                                {amenityArray.map((amenity) => (
                                     <button
                                         key={amenity}
                                         onClick={() => handleAmenityToggle(amenity)}
-                                        className={`px-4 py-2 rounded-lg border ${formData.amenities.includes(amenity)
+                                        className={`px-2 py-1 rounded-lg border ${formData.amenities?.includes(amenity)
                                             ? 'bg-green-600 border-green-600'
                                             : 'bg-[#2a2a2a] border-gray-600'
                                             }`}
@@ -233,14 +242,17 @@ export default function AddTurf() {
                         {/* Operating Hours */}
                         <div>
                             <label className="block text-sm font-medium mb-2">Operating Hours:</label>
-                            <div className="grid grid-cols-2 gap-8">
-                                {/* From */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                                {/* Open Time */}
                                 <div>
-                                    <p className="text-sm mb-2">From</p>
+                                    <p className="text-sm mb-2">Open</p>
                                     <div className="grid grid-cols-3 gap-2">
                                         <select
-                                            value={formData.operatingHours.from.hour}
-                                            onChange={(e) => handleTimeChange('from', 'hour', e.target.value)}
+                                            value={formData.open.split(':')[0].padStart(2, '0')}
+                                            onChange={(e) =>
+                                                handleTimeChange('open', e.target.value, formData.open.split(':')[1].split(' ')[0], formData.open.split(' ')[1] as 'AM' | 'PM')
+                                            }
                                             className="p-2 bg-[#2a2a2a] border border-gray-600 rounded text-center"
                                         >
                                             {Array.from({ length: 12 }, (_, i) => (
@@ -250,8 +262,10 @@ export default function AddTurf() {
                                             ))}
                                         </select>
                                         <select
-                                            value={formData.operatingHours.from.minute}
-                                            onChange={(e) => handleTimeChange('from', 'minute', e.target.value)}
+                                            value={formData.open.split(':')[1].split(' ')[0]}
+                                            onChange={(e) =>
+                                                handleTimeChange('open', formData.open.split(':')[0], e.target.value, formData.open.split(' ')[1] as 'AM' | 'PM')
+                                            }
                                             className="p-2 bg-[#2a2a2a] border border-gray-600 rounded text-center"
                                         >
                                             {['00', '15', '30', '45'].map(minute => (
@@ -259,8 +273,10 @@ export default function AddTurf() {
                                             ))}
                                         </select>
                                         <select
-                                            value={formData.operatingHours.from.period}
-                                            onChange={(e) => handleTimeChange('from', 'period', e.target.value)}
+                                            value={formData.open.split(' ')[1]}
+                                            onChange={(e) =>
+                                                handleTimeChange('open', formData.open.split(':')[0], formData.open.split(':')[1].split(' ')[0], e.target.value as 'AM' | 'PM')
+                                            }
                                             className="p-2 bg-[#2a2a2a] border border-gray-600 rounded text-center"
                                         >
                                             <option value="AM">AM</option>
@@ -269,13 +285,15 @@ export default function AddTurf() {
                                     </div>
                                 </div>
 
-                                {/* To */}
+                                {/* Close Time */}
                                 <div>
-                                    <p className="text-sm mb-2">To</p>
+                                    <p className="text-sm mb-2">Close</p>
                                     <div className="grid grid-cols-3 gap-2">
                                         <select
-                                            value={formData.operatingHours.to.hour}
-                                            onChange={(e) => handleTimeChange('to', 'hour', e.target.value)}
+                                            value={formData.close.split(':')[0].padStart(2, '0')}
+                                            onChange={(e) =>
+                                                handleTimeChange('close', e.target.value, formData.close.split(':')[1].split(' ')[0], formData.close.split(' ')[1] as 'AM' | 'PM')
+                                            }
                                             className="p-2 bg-[#2a2a2a] border border-gray-600 rounded text-center"
                                         >
                                             {Array.from({ length: 12 }, (_, i) => (
@@ -285,8 +303,10 @@ export default function AddTurf() {
                                             ))}
                                         </select>
                                         <select
-                                            value={formData.operatingHours.to.minute}
-                                            onChange={(e) => handleTimeChange('to', 'minute', e.target.value)}
+                                            value={formData.close.split(':')[1].split(' ')[0]}
+                                            onChange={(e) =>
+                                                handleTimeChange('close', formData.close.split(':')[0], e.target.value, formData.close.split(' ')[1] as 'AM' | 'PM')
+                                            }
                                             className="p-2 bg-[#2a2a2a] border border-gray-600 rounded text-center"
                                         >
                                             {['00', '15', '30', '45'].map(minute => (
@@ -294,8 +314,10 @@ export default function AddTurf() {
                                             ))}
                                         </select>
                                         <select
-                                            value={formData.operatingHours.to.period}
-                                            onChange={(e) => handleTimeChange('to', 'period', e.target.value)}
+                                            value={formData.close.split(' ')[1]}
+                                            onChange={(e) =>
+                                                handleTimeChange('close', formData.close.split(':')[0], formData.close.split(':')[1].split(' ')[0], e.target.value as 'AM' | 'PM')
+                                            }
                                             className="p-2 bg-[#2a2a2a] border border-gray-600 rounded text-center"
                                         >
                                             <option value="AM">AM</option>
@@ -312,10 +334,10 @@ export default function AddTurf() {
                                 <label className="block text-sm font-medium mb-2">Turf Size:</label>
                                 <div className="flex">
                                     <input
-                                        type="text"
+                                        type="number"
                                         value={formData.turfSize}
                                         onChange={(e) => handleInputChange('turfSize', e.target.value)}
-                                        className="flex-1 p-3 bg-[#2a2a2a] border border-gray-600 rounded-l-lg focus:outline-none focus:border-green-500"
+                                        className="flex-1 p-3 bg-[#2a2a2a] border border-gray-600 rounded-l-lg focus:outline-none focus:border-green-500 appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                         placeholder="Size"
                                     />
                                     <span className="px-3 py-3 bg-[#3a3a3a] border border-gray-600 rounded-r-lg border-l-0">
@@ -327,10 +349,10 @@ export default function AddTurf() {
                                 <label className="block text-sm font-medium mb-2">Rate (per 90 mins slot):</label>
                                 <div className="flex">
                                     <input
-                                        type="text"
+                                        type="number"
                                         value={formData.rate}
                                         onChange={(e) => handleInputChange('rate', e.target.value)}
-                                        className="flex-1 p-3 bg-[#2a2a2a] border border-gray-600 rounded-l-lg focus:outline-none focus:border-green-500"
+                                        className="flex-1 p-3 bg-[#2a2a2a] border border-gray-600 rounded-l-lg focus:outline-none focus:border-green-500 appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                         placeholder="Rate"
                                     />
                                     <span className="px-3 py-3 bg-[#3a3a3a] border border-gray-600 rounded-r-lg border-l-0">

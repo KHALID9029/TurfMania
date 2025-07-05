@@ -1,27 +1,17 @@
-export default interface turfDto {
-  _id: string;
-  name: string;
+
+export default interface TurfDto {
+  turfName: string;
+  ownerId: number;
+  photos?: string[];
   street: string;
   postCode: string;
   city: string;
-  ownerId: string; // Reference to the owner's user ID
-  photos: string[]; // URLs or paths to image files
-  location: {
-    lat: number;
-    lng: number;
-  }; // Google Maps coordinates
+  amenities?: string[];
+  open: string;  // e.g., "06:00 AM"
+  close: string; // e.g., "10:00 PM"
+  turfSize: number;
+  rate: number;
+  lat: number;
+  lng: number;
 
-  amenities?: string[]; // List of amenity names
-  
-  operatingHours: {
-    open: string;  
-    close: string; 
-  };
-
-  size: {
-    width: number;  
-    height: number;
-  };
-
-  rate: number; // price per hour or slot
 }

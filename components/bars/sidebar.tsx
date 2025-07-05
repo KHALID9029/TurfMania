@@ -17,7 +17,7 @@ import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import clsx from "clsx"
 import { useState, useEffect } from "react"
-
+import { useSession } from "next-auth/react"
 const navItems = [
   { name: "Dashboard", icon: <LayoutDashboard />, href: "/owner/dashboard" },
   { name: "My Turfs", icon: <MapPin />, href: "/owner/turfs" },
@@ -35,6 +35,7 @@ const Sidebar = () => {
   const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [expanded, setExpanded] = useState(true)
+  const { data: session, status } = useSession()
 
   const handleLogout = () => {
     alert("Logged out!")
@@ -63,8 +64,8 @@ const Sidebar = () => {
           <div className="flex space-between items-center mb-6">
             {/* <div className="w-16 h-16 bg-red-600 rounded-full" /> */}
             <img src="/images/turf3.jpg" className={clsx(expanded && "md:w-20 md:h-20 bg-transparent rounded-full","w-12 h-12 bg-transparent rounded-full" )} />
-            {expanded && <h4 className="pl-2">Owner's Name</h4>}
           </div>
+           {expanded && <h6 className="text-sm pl-2 mb-4">{session?.user.name}</h6>}
 
           <ul className="space-y-2 text-sm">
             {navItems.map((item) => (
