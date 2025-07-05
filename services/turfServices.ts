@@ -1,54 +1,47 @@
 import { NextRequest, NextResponse } from "next/server";
-import turfDto from "@/dto/turfDto";
 import { ITurf } from "@/models/Turf";
 
 import {
     getAllTurfs,
     getTurfById,
+    getTurfByName,
     postTurf,
     putTurf,
-    deleteTurf
+    deleteTurf,
 } from "@/repositories/turfRepository";
+import turfDto from "@/dto/turfDto";
 
 export async function getAllTurfsService(req: NextRequest) {
     return getAllTurfs(req);
 }
 
-export async function getTurfByIdService(id: string) {
-    if(!id) {
+export async function getTurfByIdService(id: number) {
+    if (!id) {
         return NextResponse.json({ error: "Turf ID is required" }, { status: 400 });
     }
     return getTurfById(id);
 }
-export async function postTurfService(turf: ITurf) {
 
-    if (!turf || !turf.name || !turf.street || !turf.postCode || !turf.city || !turf.ownerId || !turf.location) {
-        return NextResponse.json({ error: "Invalid turf data" }, { status: 400 });
+export async function getTurfByNameService(name: string) {
+    if (!name) {
+        return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
-
-    if(turf.photos.length <3) {
-        return NextResponse.json({ error: "At least 3 photos are required" }, { status: 400 });
-    }
-
-    if(!turf.size || !turf.size.width || !turf.size.height) {
-        return NextResponse.json({ error: "Size information is required" }, { status: 400 });
-    }
-
-    if(!turf.rate || turf.rate <= 0) {
-        return NextResponse.json({ error: "Rate must be a positive number" }, { status: 400 });
-    }
-
-    return postTurf(turf);
+    return getTurfByName(name);
 }
 
+export async function postTurfService(Turf: ITurf) {
 
-export async function putTurfService(id: string, turfDto: turfDto) {
+
+    return postTurf(Turf);
+}
+
+export async function putTurfService(id: number, turfDto: turfDto) {
 
     const updateData: Partial<ITurf> = turfDto;
-    
-    try{
+
+    try {
         const turf = await getTurfById(id);
-        
+
         if (!turf) {
             return NextResponse.json({ error: "Turf not found" }, { status: 404 });
         }
@@ -56,37 +49,35 @@ export async function putTurfService(id: string, turfDto: turfDto) {
         // Apply updates only to fields that are provided
         // Dynamically construct the update object and exclude undefined or _id fields
         const updateTurfData: Partial<ITurf> = Object.fromEntries(
-         Object.entries(updateData).filter(([key, value]) => key !== '_id' && value !== undefined && value !== null)
+            Object.entries(updateData).filter(([key, value]) => key !== '_id' && value !== undefined && value !== null)
         );
 
         return putTurf(id, updateTurfData);
-    }catch (error) {
-        console.error("Error updating turf:", error);
-        return NextResponse.json({ error: "Failed to update turf" }, { status: 500 });
+    } catch (error) {
+        console.error("Error updating Turf:", error);
+        return NextResponse.json({ error: "Failed to update Turf" }, { status: 500 });
     }
 }
 
 
-export async function deleteTurfService(req: NextRequest) {
-    
-    const {searchParams} = new URL(req.url);
-    const id = searchParams.get('id');
-    
+export async function deleteTurfService(id: number) {
+
     if (!id) {
         return NextResponse.json({ error: "Turf ID is required" }, { status: 400 });
     }
 
     try {
         const turf = await getTurfById(id);
-        
+
         if (!turf) {
             return NextResponse.json({ error: "Turf not found" }, { status: 404 });
         }
 
         return deleteTurf(id);
     } catch (error) {
-        console.error("Error deleting turf:", error);
-        return NextResponse.json({ error: "Failed to delete turf" }, { status: 500 });
+        console.error("Error deleting Turf:", error);
+        return NextResponse.json({ error: "Failed to delete Turf" }, { status: 500 });
     }
-    
+
 }
+
