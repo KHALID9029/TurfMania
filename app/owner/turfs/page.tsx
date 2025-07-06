@@ -49,46 +49,6 @@ export default function Turf() {
 
     return (
         <div className="relative flex min-h-screen bg-[#121212] text-white">
-            {/* Inject scrollbar styles */}
-            <style
-                dangerouslySetInnerHTML={{
-                    __html: `
-    .custom-scrollbar {
-      scrollbar-width: none; /* Firefox - hide by default */
-    }
-
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 0px; /* Chrome/Safari - hide by default */
-    }
-
-    /* On hover: show styled scrollbar */
-    .custom-scrollbar:hover {
-      scrollbar-width: thin;
-      scrollbar-color: #3b82f6 #2e2e2e;
-    }
-
-    .custom-scrollbar:hover::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .custom-scrollbar:hover::-webkit-scrollbar-track {
-      background: #2e2e2e;
-    }
-
-    .custom-scrollbar:hover::-webkit-scrollbar-thumb {
-      background-color: #3b82f6;
-      border-radius: 6px;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-button {
-      display: none;
-      height: 0;
-    }
-  `,
-                }}
-            />
-
-
             {/* Sidebar */}
             <Sidebar />
 
