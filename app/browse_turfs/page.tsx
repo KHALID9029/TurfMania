@@ -90,7 +90,7 @@ const BrowsePage = () => {
     const rightIndex = getWrappedIndex(activeIndex + 1);
 
     const base =
-      "absolute transition-all duration-500 ease-in-out w-[300px] rounded-xl overflow-hidden group cursor-pointer";
+      "absolute transition-all duration-500 ease-in-out w-[90vw] sm:w-[400px] rounded-xl overflow-hidden group cursor-pointer";
 
     if (index === activeIndex) {
       return `${base} z-20 scale-110`;

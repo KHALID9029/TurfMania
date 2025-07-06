@@ -4,6 +4,7 @@ import { Bell } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation"
 import { FC, ReactElement } from "react";
+import toast from "react-hot-toast";
 
 
 
@@ -21,12 +22,15 @@ export const Navbar: FC<NavbarProps>=(
     const activePage = props.activePage || "Home";
 
     
-    const handleTurfOwnerClick = (e: React.MouseEvent) => {
+    const handleDashboardRedirect = (e: React.MouseEvent) => {
         e.preventDefault(); // prevent default navigation
-        if (session?.user?.role === 'Owner') {
+        if (!session) {
+          toast.error("You need to log in to access the dashboard.");
+          router.push('/login');
+        }else if (session?.user?.role === 'Owner') {
         router.push('/owner/dashboard');
         } else {
-        router.push('/login');
+          router.push('/player/dashboard');
         }
     };
 
@@ -36,7 +40,7 @@ export const Navbar: FC<NavbarProps>=(
                 <ul className="hidden md:flex space-x-8 text-sm">
                   <li><Link href="/homePage" className={activePage=="Home"? "text-cyan-400 [text-shadow:0_0_5px_#22d3ee,0_0_10px_#22d3ee,0_0_20px_#22d3ee]": "hover:text-cyan-400"}>Home</Link></li>
                   <li><Link href="/browse_turfs" className={activePage=="Turfs"? "text-cyan-400 [text-shadow:0_0_5px_#22d3ee,0_0_10px_#22d3ee,0_0_20px_#22d3ee]": "hover:text-cyan-400"}>Turfs</Link></li>
-                  <li onClick={handleTurfOwnerClick} className={activePage=="Turf Owner"? "text-cyan-400 [text-shadow:0_0_5px_#22d3ee,0_0_10px_#22d3ee,0_0_20px_#22d3ee]": "hover:text-cyan-400 cursor-pointer"}>Turf Owner</li>
+                  <li onClick={handleDashboardRedirect} className={activePage=="Turf Owner"? "text-cyan-400 [text-shadow:0_0_5px_#22d3ee,0_0_10px_#22d3ee,0_0_20px_#22d3ee]": "hover:text-cyan-400 cursor-pointer"}>Dashboard</li>
                   <li><Link href="/about" className={activePage=="About"? "text-cyan-400 [text-shadow:0_0_5px_#22d3ee,0_0_10px_#22d3ee,0_0_20px_#22d3ee]": "hover:text-cyan-400"}>About Us</Link></li>
                   <li><Link href="/contact" className={activePage=="Contact"? "text-cyan-400 [text-shadow:0_0_5px_#22d3ee,0_0_10px_#22d3ee,0_0_20px_#22d3ee]": "hover:text-cyan-400"}>Contact us</Link></li>
                 </ul>
