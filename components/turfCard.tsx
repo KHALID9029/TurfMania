@@ -35,9 +35,19 @@ const TurfCard = ({ name, location, imageUrl, amenities, rating,rate }: TurfProp
                 </div>
 
                 <div className="flex justify-between text-xs md:text-sm text-gray-300">
-                    <div>
-                        <span className="">Ratings:</span> {rating.toFixed(1)}
+                    <div className="flex text-yellow-400">
+                        {Array.from({ length: 5 }, (_, i) => {
+                            const starNumber = i + 1;
+                            if (rating >= starNumber) {
+                            return <span key={i}>★</span>; // full star
+                            } else if (rating >= starNumber - 0.5) {
+                            return <span key={i}>⯨</span>; // approximate half star
+                            } else {
+                            return <span key={i}>☆</span>; // empty star
+                            }
+                        })}
                     </div>
+
                     <div>
                         <span className="">Rate:</span> ৳{rate}/hr
                     </div>
