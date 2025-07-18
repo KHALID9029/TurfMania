@@ -6,39 +6,42 @@ import Link from "next/link";
 
 import BackgroundCircles from "@/components/backgrounds/backgroundCircles";
 import Navbar from "@/components/bars/navbar";
-
+import SpotlightCard from '@/components/spotlightCard';
+import DarkVeil from "@/components/backgrounds/darkVeils";
+import ShinyText from "@/components/customTextStyle/shinyText";
+  
 
 export default function HomePage() {
 
-    // Sample images for the popular turfs section
-    const images = ["/images/turf1.jpg", "/images/turf2.jpg", "/images/turf3.jpg", "/images/turf4.jpg"];
-    const [activeIndex, setActiveIndex] = useState(0);
-    const len = images.length;
-    
-    // Extra
-    const intervalRef = useRef<NodeJS.Timeout | null>(null);
-    const [isPaused, setIsPaused] = useState(false);
+  // Sample images for the popular turfs section
+  const images = ["/images/turf1.jpg", "/images/turf2.jpg", "/images/turf3.jpg", "/images/turf4.jpg"];
+  const [activeIndex, setActiveIndex] = useState(0);
+  const len = images.length;
 
-    const getWrappedIndex = (index: number) => (index + len) % len;
+  // Extra
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [isPaused, setIsPaused] = useState(false);
 
-    const getCardStyle = (index: number) => {
-      const leftIndex = getWrappedIndex(activeIndex - 1);
-      const rightIndex = getWrappedIndex(activeIndex + 1);
+  const getWrappedIndex = (index: number) => (index + len) % len;
 
-      const base = "absolute transition-all duration-500 ease-in-out w-[300px] h-[200px] rounded-xl overflow-hidden group cursor-pointer";
+  const getCardStyle = (index: number) => {
+    const leftIndex = getWrappedIndex(activeIndex - 1);
+    const rightIndex = getWrappedIndex(activeIndex + 1);
 
-      if (index === activeIndex) {
-        return `${base} z-20 scale-110`;
-      } else if (index === leftIndex) {
-        return `${base} -translate-x-[100%] z-10 opacity-80`;
-      } else if (index === rightIndex) {
-        return `${base} translate-x-[100%] z-10 opacity-80`;
-      } else {
-        return `hidden`; // hide all other cards
-      }
-    };
+    const base = "absolute transition-all duration-500 ease-in-out w-[300px] h-[200px] rounded-xl overflow-hidden group cursor-pointer";
 
-    // Auto-rotation effect
+    if (index === activeIndex) {
+      return `${base} z-20 scale-110`;
+    } else if (index === leftIndex) {
+      return `${base} -translate-x-[100%] z-10 opacity-80`;
+    } else if (index === rightIndex) {
+      return `${base} translate-x-[100%] z-10 opacity-80`;
+    } else {
+      return `hidden`; // hide all other cards
+    }
+  };
+
+  // Auto-rotation effect
   useEffect(() => {
     if (!isPaused) {
       intervalRef.current = setInterval(() => {
@@ -57,7 +60,7 @@ export default function HomePage() {
   const [displayed, setDisplayed] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [index, setIndex] = useState(0);
- 
+
   useEffect(() => {
     const typingSpeed = isDeleting ? 50 : 100;
     const pauseTime = 1000;
@@ -82,7 +85,11 @@ export default function HomePage() {
 
   return (
     <main className="bg-transparent text-white font-sans">
-      <BackgroundCircles/>
+      <div className="fixed inset-0 -z-10">
+        <DarkVeil
+        />
+      </div>
+
       {/* Navigation Bar */}
       <Navbar activePage="Home" />
 
@@ -92,68 +99,73 @@ export default function HomePage() {
           { title: "Simple", subtitle: "Book in Minutes", image: "/images/turf1.jpg" },
           { title: "Secure", subtitle: "Verified Listings", image: "/images/turf2.jpg" },
           { title: "Flexible", subtitle: "Anytime Access", image: "/images/turf3.jpg" },
-          ].map((card, index) => (
+        ].map((card, index) => (
+          <SpotlightCard key={index} className="custom-spotlight-card" spotlightColor="rgba(0, 229, 255, 0.2)">
             <div
-            key={index}
-            className="relative w-90 h-130 rounded-xl overflow-hidden shadow-lg group"
+              key={index}
+              className="relative w-90 h-120 rounded-xl overflow-hidden"
             >
-            {/* Background Image */}
-            <Image
-              src={card.image}
-              alt={card.title}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-              />
+              {/* Background Image */}
 
-            {/* Optional dark overlay */}
-            <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-all duration-300" />
 
-            {/* Text Overlay */}
-            <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-4">
-              <h3 className="text-lg font-bold mb-1">{card.title}</h3>
-              <p className="text-sm text-gray-200">{card.subtitle}</p>
+              {/* Optional dark overlay */}
+              <div className="absolute inset-0 bg-transparent" />
+
+              {/* Text Overlay */}
+              <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-4">
+
+
+                <ShinyText text={card.title} disabled={false} speed={3} className='custom-class' />
+                <ShinyText text={card.subtitle} disabled={false} speed={3} className='custom-class mt-2' />
+              </div>
             </div>
-          </div>
-          ))}
+          </SpotlightCard>
+        ))}
       </section>
+
+
+
+      {/* <SpotlightCard className="custom-spotlight-card" spotlightColor="rgba(0, 229, 255, 0.2)">
+
+      </SpotlightCard> */}
 
       {/* Popular Turfs */}
       <section className="px-10 relative h-[250px]">
-      <h2 className="text-xl text-white mb-6">
-        <span className="text-sky-400">Popular</span> Turfs
-      </h2>
+        <h2 className="text-xl text-white mb-6">
+          <span className="text-sky-400">Popular</span> Turfs
+        </h2>
 
-      <div
-        className="relative flex justify-center items-center h-[200px]"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-      >
-        {images.map((img, index) => (
-          <div
-            key={index}
-            className={getCardStyle(index)}
-            onClick={() => setActiveIndex(index)}
-          >
-            <Image
-              src={img}
-              alt={`Turf ${index + 1}`}
-              fill
-              className="object-cover rounded-xl"
-            />
-            <div className="absolute bottom-0 w-full bg-black/60 text-white text-center py-2 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              Turf {index + 1}
+        <div
+          className="relative flex justify-center items-center h-[200px]"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
+          {images.map((img, index) => (
+            <div
+              key={index}
+              className={getCardStyle(index)}
+              onClick={() => setActiveIndex(index)}
+            >
+              <Image
+                src={img}
+                alt={`Turf ${index + 1}`}
+                fill
+                className="object-cover rounded-xl"
+              />
+              <div className="absolute bottom-0 w-full bg-black/60 text-white text-center py-2 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                Turf {index + 1}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-    </section>
+          ))}
+        </div>
+      </section>
 
       {/* Call to Action */}
       <section className="text-center py-16">
         <h3 className="text-lg text-white mb-6 font-mono">
-        {displayed}
-        <span className="animate-pulse text-white">|</span>
-      </h3>
+          {displayed}
+          <span className="animate-pulse text-white">|</span>
+        </h3>
         <div className="flex justify-center gap-6">
           <Link href="/register?role=Player">
             <button className="bg-cyan-400 hover:bg-cyan-500 text-black font-medium px-5 py-2 rounded">Register as Player</button>
