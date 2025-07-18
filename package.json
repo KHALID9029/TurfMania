@@ -20,6 +20,7 @@
     "mongoose": "^8.16.1",
     "next": "15.3.0",
     "next-auth": "^4.24.11",
+    "next-cloudinary": "^6.16.0",
     "openssl": "^2.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
