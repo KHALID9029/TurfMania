@@ -12,19 +12,32 @@ import {
 
 // Helper function to parse request to turfDto
 async function parseRequestToTurfDto(data: FormData) {
+
+  const photos: string[] = [];
+  const amenities: string[] = [];
+
+  // Extract all "photos[i]" entries
+  for (const [key, value] of data.entries()) {
+    if (key.startsWith("photos[")) {
+      if (typeof value === "string") {
+        photos.push(value);
+      } 
+    }
+    if (key.startsWith("amenities[")) {
+      if (typeof value === "string") {
+        amenities.push(value);
+      }
+    }
+  }
   const body = {
     turfId: parseInt(data.get('turfId') as string) || 0,
     turfName: data.get('turfName') as string,
     ownerId: parseInt(data.get('ownerId') as string),
-    photos: data.get('photos')
-      ? JSON.parse(data.get('photos') as string) as string[]
-      : [],
+    photos,
     street: data.get('street') as string,
     postCode: data.get('postCode') as string,
     city: data.get('city') as string,
-    amenities: data.get('amenities')
-      ? JSON.parse(data.get('amenities') as string) as string[]
-      : [],
+    amenities,
     open: data.get('open') as string,
     close: data.get('close') as string,
     turfSize: parseFloat(data.get('turfSize') as string),
@@ -70,8 +83,11 @@ export async function GET(req: NextRequest) {
 /** POST: Create a new user */
 export async function POST(req: NextRequest) {
   const data = await req.formData();
-  //console.log(data);
+
+  //console.log("Received form data:", Object.fromEntries(data.entries()));
   const turfDto = await parseRequestToTurfDto(data);
+  
+  //console.log("Parsed turf DTO:", turfDto);
   const turf = turfDto as ITurf;
 
   //console.log("Parsed turf DTO:", turfDto);
