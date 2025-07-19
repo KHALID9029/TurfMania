@@ -3,8 +3,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
-import BackgroundCircles from "@/components/backgrounds/backgroundCircles";
 import Navbar from "@/components/bars/navbar";
 import SpotlightCard from '@/components/spotlightCard';
 import DarkVeil from "@/components/backgrounds/darkVeils";
@@ -12,6 +12,9 @@ import ShinyText from "@/components/customTextStyle/shinyText";
 
 
 export default function HomePage() {
+
+  // Session Data
+  const { data: session } = useSession();
 
   // Sample images for the popular turfs section
   const images = ["/images/turf1.jpg", "/images/turf2.jpg", "/images/turf3.jpg", "/images/turf4.jpg"];
@@ -140,7 +143,7 @@ export default function HomePage() {
       </SpotlightCard> */}
 
       {/* Popular Turfs */}
-      <section className="px-10 relative h-[250px]">
+      <section className="px-10 pb-100 relative h-[250px]">
         <h2 className="text-xl text-white mb-6">
           <span className="text-sky-400">Popular</span> Turfs
         </h2>
@@ -171,6 +174,8 @@ export default function HomePage() {
       </section>
 
       {/* Call to Action */}
+      { !session?.user && (
+
       <section className="text-center py-16">
         <h3 className="text-lg text-white mb-6">
           {displayed}
@@ -185,6 +190,7 @@ export default function HomePage() {
           </Link>
         </div>
       </section>
+      )}
 
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-400 px-10 py-10 text-sm">
