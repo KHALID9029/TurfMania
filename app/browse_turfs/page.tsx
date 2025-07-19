@@ -1,12 +1,11 @@
-"use client";
-import React, { useState, useEffect, useRef } from "react";
+"use client"
 
-import BackgroundCircles from "@/components/backgrounds/backgroundCircles";
-import Navbar from "@/components/bars/navbar";
-import TurfCard from "@/components/turfCard";
-import SelectAmenities from "@/components/Forms/selectAmenities";
-import FadeContent from "@/components/fadeContent";
-
+import Sidebar from "@/components/bars/sidebar"
+import TurfCard from "@/components/turfCard"
+import { useRouter } from "next/navigation"
+import { useRef, useState, useEffect } from "react";
+import Navbar from "@/components/bars/navbar"
+import { ChevronLeft, ChevronRight } from "lucide-react";
 const turfs = [
   {
     name: "ChattoTurf",
@@ -14,7 +13,7 @@ const turfs = [
     image: "/images/turf1.png",
     amenities: ["Washroom", "Locker", "Shower"],
     rating: 4.5,
-    rate: 800,
+    rate: 800
   },
   {
     name: "ChattoTurf",
@@ -22,7 +21,7 @@ const turfs = [
     image: "/images/turf1.png",
     amenities: ["Washroom", "Locker", "Shower"],
     rating: 4.5,
-    rate: 800,
+    rate: 800
   },
   {
     name: "ChattoTurf",
@@ -30,7 +29,7 @@ const turfs = [
     image: "/images/turf1.png",
     amenities: ["Washroom", "Locker", "Shower"],
     rating: 4.5,
-    rate: 800,
+    rate: 800
   },
   {
     name: "ChattoTurf",
@@ -38,226 +37,195 @@ const turfs = [
     image: "/images/turf1.png",
     amenities: ["Washroom", "Locker", "Shower"],
     rating: 4.5,
-    rate: 800,
+    rate: 800
   },
-];
-
-const nearbyTurfs = [
   {
     name: "ChattoTurf",
     location: "Chittagong",
     image: "/images/turf1.png",
     amenities: ["Washroom", "Locker", "Shower"],
     rating: 4.5,
-    rate: 800,
+    rate: 800
   },
   {
-    name: "BoroTurf",
+    name: "ChattoTurf",
     location: "Chittagong",
-    image: "/images/turf2.jpg",
+    image: "/images/turf1.png",
     amenities: ["Washroom", "Locker", "Shower"],
     rating: 4.5,
-    rate: 800,
+    rate: 800
   },
   {
-    name: "MajhariTurf",
+    name: "ChattoTurf",
     location: "Chittagong",
-    image: "/images/turf3.jpg",
+    image: "/images/turf1.png",
     amenities: ["Washroom", "Locker", "Shower"],
     rating: 4.5,
-    rate: 800,
+    rate: 800
   },
   {
-    name: "OnekChattoTurf",
+    name: "ChattoTurf",
     location: "Chittagong",
-    image: "/images/turf4.jpg",
+    image: "/images/turf1.png",
     amenities: ["Washroom", "Locker", "Shower"],
     rating: 4.5,
-    rate: 800,
+    rate: 800
   },
-];
+  {
+    name: "ChattoTurf",
+    location: "Chittagong",
+    image: "/images/turf1.png",
+    amenities: ["Washroom", "Locker", "Shower"],
+    rating: 4.5,
+    rate: 800
+  },
 
-const BrowsePage = () => {
-  // For nearby Turfs section
-  const [activeIndex, setActiveIndex] = useState(0);
-  const len = nearbyTurfs.length;
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const [isPaused, setIsPaused] = useState(false);
+]
 
-  const getWrappedIndex = (index: number) => (index + len) % len;
 
-  const getCardStyle = (index: number) => {
-    const leftIndex = getWrappedIndex(activeIndex - 1);
-    const rightIndex = getWrappedIndex(activeIndex + 1);
 
-    const base =
-      "absolute transition-all duration-500 ease-in-out w-[90vw] sm:w-[400px] rounded-xl overflow-hidden group cursor-pointer";
+export default function Turfs() {
+  const router = useRouter()
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [cardWidth, setCardWidth] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-    if (index === activeIndex) {
-      return `${base} z-20 scale-110`;
-    } else if (index === leftIndex) {
-      return `${base} -translate-x-[120%] z-10 opacity-80`;
-    } else if (index === rightIndex) {
-      return `${base} translate-x-[120%] z-10 opacity-80`;
-    } else {
-      return `hidden`; // hide all other cards
+  // Detect and set card width on resize
+  useEffect(() => {
+    const updateCardWidth = () => {
+      if (cardRef.current) {
+        const style = getComputedStyle(cardRef.current);
+        const marginRight = parseInt(style.marginRight) || 16; // fallback to 16px if undefined
+        setCardWidth(cardRef.current.offsetWidth + marginRight);
+      }
+    };
+
+    updateCardWidth();
+    window.addEventListener("resize", updateCardWidth);
+    return () => window.removeEventListener("resize", updateCardWidth);
+  }, []);
+
+  const scroll = (direction: "left" | "right") => {
+    if (!scrollRef.current || cardWidth === 0) return;
+
+    let newIndex = currentIndex;
+
+    if (direction === "left") {
+      newIndex--;
+    } else if (direction === "right") {
+      newIndex++;
     }
+    
+    if (newIndex < 0) newIndex = turfs.length - 3; // Wrap around if needed
+
+    newIndex= newIndex % (turfs.length-2); // Wrap around if needed
+    console.log(turfs.length, "Total Turfs");
+    console.log("New Index:", newIndex);
+
+    scrollRef.current.scrollTo({
+      left: newIndex * cardWidth,
+      behavior: "smooth",
+    });
+
+    setCurrentIndex(newIndex);
   };
 
-  // Auto-rotation effect
-  useEffect(() => {
-    if (!isPaused) {
-      intervalRef.current = setInterval(() => {
-        setActiveIndex((prev) => getWrappedIndex(prev + 1));
-      }, 3000);
-    }
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [isPaused]);
-
-  // For All Turfs section
-  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-
   return (
-    <FadeContent blur={false} duration={1000} easing="ease-out" initialOpacity={0}>
-      <main className="bg-transparent text-white font-sans">
-        <BackgroundCircles />
-        {/* Navigation Bar */}
-        <Navbar
-          activePage="Turfs"
-          navItems={[
-            { label: "Home", href: "/homePage" },
-            { label: "Turfs", href: "/browse_turfs" },
-            { label: "Dashboard" }, // Will trigger redirect logic
-            { label: "About", href: "/about" },
-            { label: "Contact", href: "/contact" },
-          ]}
-        />
+    <div className="">
+
+      <Navbar
+        activePage="Turfs"
+        navItems={[
+          { label: "Home", href: "/homePage" },
+          { label: "Turfs", href: "/browse_turfs" },
+          { label: "Dashboard" }, // Will trigger redirect logic
+          { label: "Bookings", href: "/bookings" },
+          { label: "Account", href: "/player/account" },
+        ]}
+      />
+
+      <main className="flex-1 p-6 relative z-10 flex flex-col min-h-0 ">
 
 
-        <div className="min-h-screen text-white p-4 md:p-8">
-          {/* Header */}
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold">
-              <span className="text-cyan-400">Browse</span> Turfs
-            </h1>
+
+
+
+        <h1 className="text-xl">Nearby Turfs</h1>
+
+        <div className="relative w-full flex justify-center">
+          {/* Scrollable container */}
+          <div
+            ref={scrollRef}
+            className="flex overflow-x-auto h-[450px] items-center gap-4 px-4 scroll-smooth scrollbar-hide snap-x snap-mandatory"
+          >
+            {turfs.map((turf, i) => (
+              <div
+                key={`${turf.name}-${i}`}
+                ref={i === 0 ? cardRef : null}
+                className="shrink-0 w-[300px] md:w-[300px] snap-start"
+              >
+                <TurfCard
+                  name={turf.name}
+                  location={turf.location}
+                  imageUrl={turf.image}
+                  amenities={turf.amenities}
+                  rating={turf.rating}
+                  rate={turf.rate}
+                />
+              </div>
+            ))}
           </div>
 
-          {/* Turfs Nearby Section */}
-          <section className="flex-1 p-6 relative z-10 flex flex-col min-h-0 mb-8">
-            <h2 className="text-lg font-semibold mb-4">Nearby Turfs</h2>
-            <div
-              className="relative w-full overflow-x-hidden flex justify-center items-center min-h-[400px] py-10"
-              onMouseEnter={() => setIsPaused(true)}
-              onMouseLeave={() => setIsPaused(false)}
-            >
-              {nearbyTurfs.map((turf, i) => (
-                <div
+          {/* Left Button */}
+          <button
+            onClick={() => scroll("left")}
+            className="absolute left-2 md:left-0 top-1/2 transform -translate-y-1/2 z-20 md:h-full bg-black/60 hover:bg-black/80 text-white p-2 rounded-full md:rounded-none"
+          >
+            <ChevronLeft size={36} />
+          </button>
+
+          {/* Right Button */}
+          <button
+            onClick={() => scroll("right")}
+            className="absolute right-2 md:right-0 top-1/2 transform -translate-y-1/2 z-20 md:h-full bg-black/60 hover:bg-black/80 text-white p-2 rounded-full md:rounded-none"
+          >
+            <ChevronRight size={36} />
+          </button>
+        </div>
+
+
+
+
+        {/* Scrollable grid with fading edges */}
+        <div className="relative flex-1 mt-5">
+          <div
+            className="custom-scrollbar overflow-y-auto p-4 pt-4 pb-10"
+            style={{ maxHeight: "90svh" }}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 md:p-10 md:m-2 lg:grid-cols-3 gap-4">
+              {turfs.map((turf, i) => (
+                <TurfCard
                   key={`${turf.name}-${i}`}
-                  className={getCardStyle(i)}
-                  onClick={() => setActiveIndex(i)}
-                >
-                  <TurfCard
-                    name={turf.name}
-                    location={turf.location}
-                    imageUrl={turf.image}
-                    amenities={turf.amenities}
-                    rating={turf.rating}
-                    rate={turf.rate}
-                  />
-                </div>
+                  name={turf.name}
+                  location={turf.location}
+                  imageUrl={turf.image}
+                  amenities={turf.amenities}
+                  rating={turf.rating}
+                  rate={turf.rate}
+                />
               ))}
             </div>
-          </section>
+          </div>
 
-          {/* All Turfs Section */}
-          <section>
-            <h2 className="text-lg font-semibold mb-4">All Turfs</h2>
-            <div className="flex flex-wrap items-center justify-between mb-4 gap-4">
-              <div className="flex items-center space-x-2">
-                <span className="text-gray-300">Sort by:</span>
-                <select className="bg-gray-800 text-white rounded p-1 text-sm">
-                  <option selected>Default</option>
-                  <option>Rating</option>
-                  <option>Price</option>
-                  <option>Turf Size</option>
-                </select>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-gray-300">Tags:</span>
-                <div className="flex space-x-1 flex-wrap">
-                  {selectedAmenities.slice(0, 3).map((tag, idx) => (
-                    <span
-                      key={idx}
-                      className="bg-gray-700 text-green-400 rounded-full px-2 py-0.5 text-xs flex items-center space-x-1"
-                    >
-                      <span>{tag}</span>
-                      <button
-                        onClick={() =>
-                          setSelectedAmenities(
-                            selectedAmenities.filter((a) => a !== tag)
-                          )
-                        }
-                        className="text-red-400 hover:text-red-300 focus:outline-none ml-1"
-                        title="Remove"
-                      >
-                        &times;
-                      </button>
-                    </span>
-                  ))}
+          {/* Top Fade */}
+          <div className="pointer-events-none absolute top-[-1.5px] md:top-0 left-0 right-0 h-8 bg-gradient-to-b from-[#000000] to-transparent z-20" />
 
-                  {selectedAmenities.length > 3 && (
-                    <span className="bg-gray-700 text-green-400 rounded-full px-2 py-0.5 text-xs">
-                      +{selectedAmenities.length - 3}
-                    </span>
-                  )}
-
-                  <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="bg-gray-700 text-green-400 rounded-full px-2 py-0.5 text-xs flex items-center justify-center hover:bg-gray-600"
-                    title="Choose amenities"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-
-              {isModalOpen && (
-                <SelectAmenities
-                  selectedAmenities={selectedAmenities}
-                  setSelectedAmenities={setSelectedAmenities}
-                  onClose={() => setIsModalOpen(false)}
-                />
-              )}
-            </div>
-
-            {/* Turf Cards */}
-            <main className="flex-1 p-6  relative z-10 flex flex-col min-h-0">
-              <div
-                className="custom-scrollbar grid grid-cols-1 md:grid-cols-2 mt-5 lg:grid-cols-3 gap-4 p-4 pt-4 pb-10 overflow-y-auto"
-                style={{ maxHeight: "90svh" }}
-              >
-                {turfs.map((turf, i) => (
-                  <TurfCard
-                    key={`${turf.name}-${i}`}
-                    name={turf.name}
-                    location={turf.location}
-                    imageUrl={turf.image}
-                    amenities={turf.amenities}
-                    rating={turf.rating}
-                    rate={turf.rate}
-                  />
-                ))}
-              </div>
-            </main>
-          </section>
+          {/* Bottom Fade */}
+          <div className="pointer-events-none absolute bottom-[-1.5px] md:bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[#000000] to-transparent z-20" />
         </div>
       </main>
-    </FadeContent>
-  );
-};
 
-export default BrowsePage;
+    </div>
+  )
+}

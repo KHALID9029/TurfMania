@@ -40,6 +40,13 @@ input:-webkit-autofill:active {
 }
 
 
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
 .custom-scrollbar {
       scrollbar-width: none; /* Firefox - hide by default */
