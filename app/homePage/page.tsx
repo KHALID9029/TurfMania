@@ -9,7 +9,7 @@ import Navbar from "@/components/bars/navbar";
 import SpotlightCard from '@/components/spotlightCard';
 import DarkVeil from "@/components/backgrounds/darkVeils";
 import ShinyText from "@/components/customTextStyle/shinyText";
-  
+
 
 export default function HomePage() {
 
@@ -91,7 +91,17 @@ export default function HomePage() {
       </div>
 
       {/* Navigation Bar */}
-      <Navbar activePage="Home" />
+      <Navbar
+        activePage="Home"
+        navItems={[
+          { label: "Home", href: "/homePage" },
+          { label: "Turfs", href: "/browse_turfs" },
+          { label: "Dashboard" }, // Will trigger redirect logic
+          { label: "About", href: "/about" },
+          { label: "Contact", href: "/contact" },
+        ]}
+      />
+
 
       {/* Feature Cards */}
       <section className="flex justify-center items-center gap-10 px-10 py-16 flex-wrap">
@@ -162,7 +172,7 @@ export default function HomePage() {
 
       {/* Call to Action */}
       <section className="text-center py-16">
-        <h3 className="text-lg text-white mb-6 font-mono">
+        <h3 className="text-lg text-white mb-6">
           {displayed}
           <span className="animate-pulse text-white">|</span>
         </h3>
