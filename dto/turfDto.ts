@@ -14,4 +14,5 @@ export default interface TurfDto {
   rate: number;
   lat: number;
   lng: number;
+  rating?: number; // Optional field for average rating
 }

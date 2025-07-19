@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   getAllTurfsService,
   getTurfByIdService,
+  getTurfsByOwnerIdService,
   postTurfService,
   putTurfService,
   deleteTurfService
@@ -72,6 +73,13 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const id = searchParams.get('id');
   const turfId = parseInt(id as string) || 0;
+
+  const ownerId = searchParams.get('ownerId');
+  const ownerIdInt = parseInt(ownerId as string) || 0;
+
+  if (ownerIdInt > 0) {
+    return getTurfsByOwnerIdService(ownerIdInt);
+  }
 
   if (id) {
     return getTurfByIdService(turfId);
