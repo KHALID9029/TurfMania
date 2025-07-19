@@ -16,7 +16,7 @@ export interface ITurf extends Document {
   rate: number;
   lat: number;
   lng: number;
-
+  rating?: number; // Optional field for average rating
 }
 
 
@@ -35,7 +35,8 @@ const TurfSchema: Schema = new Schema(
     turfSize: { type: Number, required: true }, // e.g., "5-a-side", "7-a-side"
     rate: { type: Number, required: true }, // price per hour or slot
     lat: { type: Number, required: true },
-    lng: { type: Number, required: true }
+    lng: { type: Number, required: true },
+    rating: { type: Number, default: 0 }, // Average rating, default to 0
   }
 );
 

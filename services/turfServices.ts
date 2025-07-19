@@ -5,6 +5,7 @@ import {
     getAllTurfs,
     getTurfById,
     getTurfByName,
+    getTurfsByOwnerId,
     postTurf,
     putTurf,
     deleteTurf,
@@ -27,6 +28,14 @@ export async function getTurfByNameService(name: string) {
         return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
     return getTurfByName(name);
+}
+
+export async function getTurfsByOwnerIdService(ownerId: number) {
+    if (!ownerId) {
+        return NextResponse.json({ error: "Owner ID is required" }, { status: 400 });
+    }
+    // Assuming you have a function to get turfs by owner ID
+    return getTurfsByOwnerId(ownerId);
 }
 
 export async function postTurfService(Turf: ITurf) {

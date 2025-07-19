@@ -53,6 +53,21 @@ export async function getTurfByName(name: string) {
     }
 }
 
+export async function getTurfsByOwnerId(ownerId: number) {
+    try {
+        await connectDB();
+        const turfs = await Turf.find({ ownerId: ownerId });
+        if (!turfs || turfs.length === 0) {
+            return NextResponse.json({ error: "No turfs found for this owner" }, { status: 404 });
+        }
+        const turfDtos = turfs.map(turf => toTurfDto(turf));
+        return NextResponse.json(turfDtos, { status: 200 });
+    } catch (error) {
+        console.error("Error fetching turfs by owner ID:", error);
+        return NextResponse.json({ error: "Failed to fetch turfs by owner ID" }, { status: 500 });
+    }
+}
+
 
 
 /** POST: Creates a new user in the database **/
