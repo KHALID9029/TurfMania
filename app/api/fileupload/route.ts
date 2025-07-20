@@ -4,6 +4,7 @@ import cloudinary from "@/lib/cloudinary";
 
 interface CloudinaryUploadResult{
     public_id: string;
+    secure_url: string;
     //[key: string]: any; // Allow additional properties
 }
 
@@ -18,7 +19,9 @@ export async function POST(request: NextRequest) {
 
         const formdata = await request.formData();
         const file = formdata.get("file") as File | null;
-        
+        const subFolder = formdata.get("subFolder") as string | null;
+        const folderPath = subFolder ? `turfmania/${subFolder}` : "Turf";
+
         if (!file) {
             return NextResponse.json({ error: "No file provided" }, { status: 400 });
         }
@@ -30,7 +33,7 @@ export async function POST(request: NextRequest) {
             (resolve, reject) => {
                 const uploadStream = cloudinary.uploader.upload_stream(
                     {
-                        folder: "turfmania",
+                        folder: folderPath,
                         use_filename: true,
                         unique_filename: true,
                         overwrite: true
@@ -48,7 +51,10 @@ export async function POST(request: NextRequest) {
                 uploadStream.end(buffer);
             }
         )
-        return NextResponse.json({ publicId: result.public_id }, { status: 200 });
+        return NextResponse.json({ 
+            publicId: result.public_id,
+            secure_url: result.secure_url, 
+        }, { status: 200 });
 
     }catch (error) {
         console.error("Error uploading image:", error);
