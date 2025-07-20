@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation"
 import { useRef, useState, useEffect, useMemo } from "react";
 import Navbar from "@/components/bars/navbar"
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { ITurf } from "@/models/Turf";
 import FadeContent from "@/components/fadeContent";
+import TurfDto from "@/dto/turfDto";
 
 
 
@@ -33,22 +33,38 @@ export default function Turfs() {
     return () => window.removeEventListener("resize", updateCardWidth);
   }, []);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!scrollRef.current || cardWidth === 0) return;
+      const scrollLeft = scrollRef.current.scrollLeft;
+      const index = Math.round(scrollLeft / cardWidth);
+      setCurrentIndex(index);
+    };
+
+    const scrollEl = scrollRef.current;
+    scrollEl?.addEventListener("scroll", handleScroll);
+
+    return () => {
+      scrollEl?.removeEventListener("scroll", handleScroll);
+    };
+  }, [cardWidth]);
+
   const scroll = (direction: "left" | "right") => {
     if (!scrollRef.current || cardWidth === 0) return;
+
+    const containerWidth = scrollRef.current.offsetWidth;
+    const visibleCards = Math.floor(containerWidth / cardWidth);
+    const maxIndex = turfs.length - visibleCards;
 
     let newIndex = currentIndex;
 
     if (direction === "left") {
-      newIndex--;
-    } else if (direction === "right") {
-      newIndex++;
+      newIndex = newIndex - 1;
+      if (newIndex < 0) newIndex = maxIndex; // wrap to last
+    } else {
+      newIndex = newIndex + 1;
+      if (newIndex > maxIndex) newIndex = 0; // wrap to first
     }
-
-    if (newIndex < 0) newIndex = turfs.length -1 ; // Wrap around if needed
-
-    newIndex = newIndex % (turfs.length); // Wrap around if needed
-    console.log(turfs.length, "Total Turfs");
-    console.log("New Index:", newIndex);
 
     scrollRef.current.scrollTo({
       left: newIndex * cardWidth,
@@ -59,12 +75,13 @@ export default function Turfs() {
   };
 
 
+
   const [sortOption, setSortOption] = useState("price");
 
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [turfs, setTurfs] = useState<ITurf[]>([]);
+  const [turfs, setTurfs] = useState<TurfDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   useEffect(() => {
@@ -189,6 +206,7 @@ export default function Turfs() {
                     amenities={turf.amenities ? turf.amenities : []}
                     rating={turf.rating ? turf.rating : 1}
                     rate={turf.rate}
+                    onClick={() => router.push(`/turfPage/${turf.turfId}`)}
                   />
                 </div>
               ))}
@@ -214,10 +232,10 @@ export default function Turfs() {
           {/* Sort by dropdown */}
           <h1 className="text-xl">Browse Turfs</h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 md:px-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 mt-4 md:px-10">
 
             {/* Search Bar */}
-            <div className="md:px-10 mr-5">
+            <div className="pl-5 mr-5">
               <input
                 type="text"
                 placeholder="Search turfs..."
@@ -335,6 +353,7 @@ export default function Turfs() {
                     amenities={turf.amenities ? turf.amenities : []}
                     rating={turf.rating ? turf.rating : 1}
                     rate={turf.rate}
+                    onClick={() => router.push(`/turfPage/${turf.turfId}`)}
                   />
                 ))}
 
