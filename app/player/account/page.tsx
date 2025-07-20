@@ -2,22 +2,109 @@
 
 import { Pencil } from "lucide-react";
 import React from "react";
+import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
+import UserDto from "@/dto/userDto";
+import Image from "next/image";
+
 import Navbar from "@/components/bars/navbar";
 import FadeContent from "@/components/fadeContent";
+import toast from "react-hot-toast";
+import {Modal} from "@mui/material";
+import Box from "@mui/material/Box";
+import { CircularProgress } from "@mui/material";
+
+const fetchUserInfo = async (userId: number) => {
+    try {
+        const response = await fetch(`/api/users?id=${userId}`, {
+            method: 'GET',
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch user info");
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching user info:", error);
+        return null;
+    }
+}
 
 const PlayerAccountPage: React.FC = () => {
-    const userInfo = {
-        uid: "2314342344",
-        firstName: "Kochi",
-        lastName: "Khalid",
-        dob: "29th June, 2002",
-        email: "kochiKhalid@gmail.com",
-        phone: "01778350809",
-        role: "Player",
-        city: "Chittagong",
-        road: "Agrabad Road",
-        postalCode: "Bandar-4100",
+
+    const { data: session } = useSession();
+    const [userInfo, setUserInfo] = useState<UserDto>();
+    const [openModal, setOpenModal] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [uploading, setUploading] = useState(false);
+
+    useEffect(() => {
+        if (session && session.user) {
+            const userId = session.user.userId;
+            if (!userId) {
+                console.error("User ID is not available in session");
+                return;
+            }
+            fetchUserInfo(userId).then((data) => setUserInfo(data));
+        }
+    }, [session]);
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setSelectedFile(e.target.files[0]);
+        }
     };
+
+    const handleImageUpload = async () => {
+        if (!selectedFile || !userInfo) return;
+
+        setUploading(true);
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+        formData.append("subFolder", "profile_pictures"); // Specify subfolder if needed
+
+        try {
+            const res = await fetch("/api/fileupload", {
+        method: "POST",
+        body: formData,
+      });
+
+            const data = await res.json();
+
+            if (data.secure_url) {
+                // Send the new URL to your backend to update the user profile picture
+                const formData = new FormData();
+                formData.set("profilePicture", data.secure_url);
+
+                const response = await fetch(`/api/users?id=${session?.user.userId}`, {
+                    method: 'PUT',
+                    body:formData,
+                })
+                if (!response.ok) {
+                    throw new Error("Failed to update profile picture");
+                    toast.error("Failed to update profile picture");
+                }
+                else {
+                    toast.success("Profile picture updated successfully");
+                }
+
+                setOpenModal(false);
+                window.location.reload(); // reload to get updated image
+            } else {
+                console.error("Upload failed:", data);
+            }
+        } catch (error) {
+            console.error("Error uploading image:", error);
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    if (!session || !session.user || !userInfo) {
+        return <div>Loading...</div>; // Handle loading state
+    }
 
     return (
         <FadeContent blur={true} duration={1000} easing="ease-out" initialOpacity={0}>
@@ -38,21 +125,25 @@ const PlayerAccountPage: React.FC = () => {
                     {/* Header */}
                     <div className="flex items-center gap-4 mb-8">
                         <div className="relative w-30 h-30">
-                            <img
-                                src="/images/turf3.jpg"
+                            <Image
+                                src={userInfo.profilePicture || "/images/default-profile.png"} // Fallback to default image if not set
                                 alt="Profile"
                                 className="w-30 h-30 rounded-full object-cover"
+                                width={120}
+                                height={120}
                             />
-                            <div className="absolute -top-[0px] -right-[0px] bg-zinc-700 p-[2px] rounded-full cursor-pointer hover:bg-zinc-600">
+                            <div 
+                                onClick={() => setOpenModal(true)}
+                                className="absolute -top-[0px] -right-[0px] bg-zinc-700 p-[2px] rounded-full cursor-pointer hover:bg-zinc-600">
                                 <Pencil className="w-4 h-4 text-white" />
                             </div>
                         </div>
 
                         <div>
                             <h2 className="text-2xl font-semibold">
-                                {userInfo.firstName} {userInfo.lastName}
+                                {userInfo.name}
                             </h2>
-                            <p className="text-gray-400 text-sm">UID: {userInfo.uid}</p>
+                            <p className="text-gray-400 text-sm">ID: {userInfo?.userId}</p>
                         </div>
                     </div>
 
@@ -63,11 +154,11 @@ const PlayerAccountPage: React.FC = () => {
                             <Pencil className="text-white bg-zinc-700 p-1 rounded-full w-5 h-5 cursor-pointer  hover:bg-zinc-600" />
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <Info label="First Name" value={userInfo.firstName} />
-                            <Info label="Last Name" value={userInfo.lastName} />
-                            <Info label="Date of Birth" value={userInfo.dob} />
+                            <Info label="First Name" value={userInfo.name}/>
                             <Info label="E-mail" value={userInfo.email} />
-                            <Info label="Phone no." value={userInfo.phone} />
+                            {userInfo.phone && (
+                                <Info label="Phone no." value={userInfo.phone} />
+                            )} 
                             <Info label="User Role" value={userInfo.role} />
                         </div>
                     </div>
@@ -79,12 +170,46 @@ const PlayerAccountPage: React.FC = () => {
                         </div>
                         <h3 className="text-cyan-400 text-sm font-semibold mb-4">Address</h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <Info label="City" value={userInfo.city} />
-                            <Info label="Road" value={userInfo.road} />
-                            <Info label="Postal Code" value={userInfo.postalCode} />
+                            {
+                                userInfo.street && <Info label="Street" value={userInfo.street} />
+                            }
+                            {
+                                userInfo.postCode && <Info label="Postal Code" value={userInfo.postCode} />
+                            }
+                            {
+                                userInfo.city && <Info label="City" value={userInfo.city} />
+                            }
                         </div>
                     </div>
                 </div>
+                {/* Modal for image upload */}
+                <Modal open={openModal} onClose={() => setOpenModal(false)}>
+                    <Box className="bg-zinc-900 rounded-lg p-6 m-auto mt-[20vh] w-[90%] max-w-md text-white shadow-lg">
+                        <h2 className="text-lg font-semibold mb-4">Upload New Profile Picture</h2>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className="mb-4"
+                        />
+                        <div className="flex justify-end gap-2">
+                            <button
+                                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded"
+                                onClick={() => setOpenModal(false)}
+                                disabled={uploading}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 rounded text-white"
+                                onClick={handleImageUpload}
+                                disabled={uploading || !selectedFile}
+                            >
+                                {uploading ? <CircularProgress size={20} /> : "Upload"}
+                            </button>
+                        </div>
+                    </Box>
+                </Modal>
             </div>
         </FadeContent>
     );

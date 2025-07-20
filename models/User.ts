@@ -12,6 +12,7 @@ export interface IUser extends Document{
     street?: string;
     postCode?: string;
     city?: string;
+    profilePicture?: string; // Optional profile picture field
 }
 
 
@@ -26,7 +27,8 @@ const UserSchema: Schema = new Schema(
         password: {type: String},
         street: {type: String, required: false},
         postCode: {type: String, required: false},
-        city: {type: String, required: false}
+        city: {type: String, required: false},
+        profilePicture: { type: String, required: false }, // Optional profile picture field
     }
 );
 

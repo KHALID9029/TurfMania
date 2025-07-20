@@ -8,4 +8,5 @@ export default interface UserDto {
     street?: string;
     postCode?: string;
     city?: string;
+    profilePicture?: string; // Optional profile picture field
 }
