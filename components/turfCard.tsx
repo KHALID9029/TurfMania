@@ -14,9 +14,9 @@ const TurfCard = ({ name, location, imageUrl, amenities, rating, rate }: TurfPro
   const remainingCount = amenities.length - visibleAmenities.length;
 
   return (
-    <div className="bg-[#2a2a2a] rounded-xl overflow-hidden shadow-md hover:scale-105 transition-transform duration-300">
+    <div className="bg-[#2a2a2a] rounded-xl overflow-hidden shadow-md hover:scale-105 transition-transform duration-300 flex flex-col h-full">
       <img src={imageUrl} alt={name} className="w-full h-48 object-cover" />
-      <div className="p-4 text-white">
+       <div className="p-4 text-white flex flex-col flex-grow">
         <div className="flex justify-between items-center mb-2">
           <h3 className="text-base md:text-lg">{name}</h3>
           <div className="flex items-center text-xs md:text-sm text-gray-300">
@@ -43,7 +43,7 @@ const TurfCard = ({ name, location, imageUrl, amenities, rating, rate }: TurfPro
           )}
         </div>
 
-        <div className="flex justify-between text-xs md:text-sm text-gray-300">
+         <div className="flex justify-between text-xs md:text-sm text-gray-300 mt-auto">
           <div className="flex text-yellow-400">
             {Array.from({ length: 5 }, (_, i) => {
               const starNumber = i + 1;
