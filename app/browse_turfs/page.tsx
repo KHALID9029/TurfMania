@@ -3,84 +3,94 @@
 import Sidebar from "@/components/bars/sidebar"
 import TurfCard from "@/components/turfCard"
 import { useRouter } from "next/navigation"
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import Navbar from "@/components/bars/navbar"
 import { ChevronLeft, ChevronRight } from "lucide-react";
 const turfs = [
   {
-    name: "ChattoTurf",
-    location: "Chittagong",
+    name: "TurfZone",
+    location: "Dhaka",
     image: "/images/turf1.png",
-    amenities: ["Washroom", "Locker", "Shower"],
-    rating: 4.5,
-    rate: 800
+    amenities: ["Covered Roof", "Wi-Fi", "Lighting (Night Play)", "Sound System", "Drinking Water"],
+    rating: 4.6,
+    rate: 1300,
+    size: 140,
   },
   {
-    name: "ChattoTurf",
-    location: "Chittagong",
+    name: "GreenField",
+    location: "Sylhet",
     image: "/images/turf1.png",
-    amenities: ["Washroom", "Locker", "Shower"],
-    rating: 4.5,
-    rate: 800
+    amenities: ["Locker", "Parking", "Wi-Fi", "Changing Room"],
+    rating: 3.9,
+    rate: 850,
+    size: 95,
   },
   {
-    name: "ChattoTurf",
-    location: "Chittagong",
+    name: "PlayHub",
+    location: "Rajshahi",
     image: "/images/turf1.png",
-    amenities: ["Washroom", "Locker", "Shower"],
-    rating: 4.5,
-    rate: 800
+    amenities: ["Shower", "First Aid Kit", "CCTV Security", "Air Conditioning"],
+    rating: 4.3,
+    rate: 1000,
+    size: 125,
   },
   {
-    name: "ChattoTurf",
-    location: "Chittagong",
+    name: "GoalGround",
+    location: "Khulna",
     image: "/images/turf1.png",
-    amenities: ["Washroom", "Locker", "Shower"],
-    rating: 4.5,
-    rate: 800
+    amenities: ["Lighting (Night Play)", "Changing Room", "Parking", "Covered Roof", "Shoe Rental", "Wi-Fi"],
+    rating: 4.7,
+    rate: 1200,
+    size: 135,
   },
   {
-    name: "ChattoTurf",
+    name: "ArenaX",
     location: "Chittagong",
     image: "/images/turf1.png",
-    amenities: ["Washroom", "Locker", "Shower"],
-    rating: 4.5,
-    rate: 800
+    amenities: ["Scoreboard", "Drinking Water", "Locker", "Seating Area", "Wi-Fi"],
+    rating: 4.1,
+    rate: 950,
+    size: 120,
   },
   {
-    name: "ChattoTurf",
-    location: "Chittagong",
+    name: "TurfRepublic",
+    location: "Narayanganj",
     image: "/images/turf1.png",
-    amenities: ["Washroom", "Locker", "Shower"],
-    rating: 4.5,
-    rate: 800
+    amenities: ["CCTV Security", "Parking", "Washroom", "Seating Area", "Changing Room", "Equipment Rental"],
+    rating: 3.8,
+    rate: 780,
+    size: 100,
   },
   {
-    name: "ChattoTurf",
-    location: "Chittagong",
+    name: "KickOff",
+    location: "Gazipur",
     image: "/images/turf1.png",
-    amenities: ["Washroom", "Locker", "Shower"],
-    rating: 4.5,
-    rate: 800
+    amenities: ["Shower", "Air Conditioning", "Locker", "Covered Roof", "First Aid Kit"],
+    rating: 4.0,
+    rate: 890,
+    size: 90,
   },
   {
-    name: "ChattoTurf",
-    location: "Chittagong",
+    name: "TheDome",
+    location: "Comilla",
     image: "/images/turf1.png",
-    amenities: ["Washroom", "Locker", "Shower"],
-    rating: 4.5,
-    rate: 800
+    amenities: ["Lighting (Night Play)", "Parking", "Changing Room", "Seating Area", "Wi-Fi"],
+    rating: 4.9,
+    rate: 1450,
+    size: 148,
   },
   {
-    name: "ChattoTurf",
-    location: "Chittagong",
+    name: "ElitePitch",
+    location: "Barisal",
     image: "/images/turf1.png",
-    amenities: ["Washroom", "Locker", "Shower"],
-    rating: 4.5,
-    rate: 800
+    amenities: ["Cafeteria", "Seating Area", "Washroom", "Shoe Rental"],
+    rating: 3.7,
+    rate: 560,
+    size: 105,
   },
+];
 
-]
+
 
 
 
@@ -116,10 +126,10 @@ export default function Turfs() {
     } else if (direction === "right") {
       newIndex++;
     }
-    
+
     if (newIndex < 0) newIndex = turfs.length - 3; // Wrap around if needed
 
-    newIndex= newIndex % (turfs.length-2); // Wrap around if needed
+    newIndex = newIndex % (turfs.length - 2); // Wrap around if needed
     console.log(turfs.length, "Total Turfs");
     console.log("New Index:", newIndex);
 
@@ -130,6 +140,80 @@ export default function Turfs() {
 
     setCurrentIndex(newIndex);
   };
+
+
+  const [sortOption, setSortOption] = useState("price");
+
+  const sortedTurfs = useMemo(() => {
+    return [...turfs].sort((a, b) => {
+      if (sortOption === "price") return a.rate - b.rate;
+      if (sortOption === "size") return a.size - b.size; // Assuming you have a `size` field
+      if (sortOption === "rating") return b.rating - a.rating;
+      return 0;
+    });
+  }, [turfs, sortOption]);
+
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+
+  const filteredAndSortedTurfs = useMemo(() => {
+    // First filter by search query (if any)
+    const filteredBySearch = turfs.filter((turf) => {
+      const query = searchQuery.toLowerCase();
+      return (
+        turf.name.toLowerCase().includes(query) ||
+        turf.location.toLowerCase().includes(query)
+      );
+    });
+
+    // Then filter by selected tags (amenities)
+    const filteredByTags = filteredBySearch.filter((turf) =>
+      selectedTags.every((tag) => turf.amenities.includes(tag))
+    );
+
+    // Then sort the filtered results
+    return filteredByTags.sort((a, b) => {
+      if (sortOption === "price") return a.rate - b.rate;
+      if (sortOption === "size") return a.size - b.size;
+      if (sortOption === "rating") return b.rating - a.rating;
+      return 0;
+    });
+  }, [turfs, selectedTags, sortOption, searchQuery]);
+
+
+
+
+  const amenityArray = [
+    "Washroom",
+    "Locker",
+    "Parking",
+    "Wi-Fi",
+    "Changing Room",
+    "First Aid Kit",
+    "Drinking Water",
+    "Seating Area",
+    "Cafeteria",
+    "Shower",
+    "Lighting (Night Play)",
+    "Scoreboard",
+    "Sound System",
+    "CCTV Security",
+    "Covered Roof",
+    "Shoe Rental",
+    "Equipment Rental",
+    "Air Conditioning",
+  ];
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag)
+        ? prev.filter((t) => t !== tag)
+        : [...prev, tag]
+    );
+  };
+
 
   return (
     <div className="">
@@ -163,7 +247,7 @@ export default function Turfs() {
               <div
                 key={`${turf.name}-${i}`}
                 ref={i === 0 ? cardRef : null}
-                className="shrink-0 w-[300px] md:w-[300px] snap-start"
+                className="shrink-0 w-[300px] h-[400px] md:w-[300px] snap-start"
               >
                 <TurfCard
                   name={turf.name}
@@ -194,6 +278,101 @@ export default function Turfs() {
           </button>
         </div>
 
+        {/* Sort by dropdown */}
+        <h1 className="text-xl">Browse Turfs</h1>
+        {/* Search Bar */}
+        <div className="px-5 md:px-10 mt-4 mx-5">
+          <input
+            type="text"
+            placeholder="Search turfs..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full md:w-96 bg-black border border-gray-600 rounded-md text-white px-4 py-2 focus:outline-none focus:border-green-500"
+          />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 md:px-10">
+
+          <div>
+            <label htmlFor="sort" className="ml-5 mr-2 text-sm font-medium text-white">
+              Sort by:
+            </label>
+            <select
+              id="sort"
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value)}
+              className="rounded-md border border-gray-600 bg-black text-white text-sm px-3 py-2 focus:outline-none"
+            >
+              <option value="price">Price</option>
+              <option value="size">Size</option>
+              <option value="rating">Rating</option>
+            </select>
+          </div>
+          <div className="ml-6 flex items-center gap-2 flex-wrap">
+            <span className="text-sm text-white font-medium">Tags:</span>
+            {selectedTags.map((tag, i) => (
+              <span
+                key={i}
+                className="flex items-center gap-1 text-xs bg-white text-black px-2 py-1 rounded-full"
+              >
+                {tag}
+                <button
+                  onClick={() =>
+                    setSelectedTags((prev) => prev.filter((t) => t !== tag))
+                  }
+                  className="text-red-600 hover:text-red-800 font-bold"
+                  aria-label={`Remove ${tag}`}
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="text-white text-xl font-bold px-2 pb-1 hover:text-green-400"
+              aria-label="Add Tag"
+            >
+              +
+            </button>
+
+            {isModalOpen && (
+              <div className="fixed inset-0 z-50 bg-black-900 bg-opacity-10 backdrop-blur-sm flex shadow-lg items-center justify-center">
+
+                <div className="bg-black rounded-lg p-6 max-w-md w-full">
+                  <h2 className="text-lg font-semibold mb-4">Select Amenities</h2>
+                  <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto custom-scrollbar">
+                    {amenityArray.map((amenity) => (
+                      <label key={amenity} className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedTags.includes(amenity)}
+                          onChange={() => toggleTag(amenity)}
+                          className="accent-green-600"
+                        />
+                        <span>{amenity}</span>
+                      </label>
+                    ))}
+                  </div>
+                  <div className="mt-4 flex justify-end gap-2">
+                    <button
+                      onClick={() => setIsModalOpen(false)}
+                      className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 text-black"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => setIsModalOpen(false)}
+                      className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                    >
+                      Done
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </div>
+        </div>
 
 
 
@@ -203,8 +382,9 @@ export default function Turfs() {
             className="custom-scrollbar overflow-y-auto p-4 pt-4 pb-10"
             style={{ maxHeight: "90svh" }}
           >
+            {filteredAndSortedTurfs.length === 0 && <div className="flex justify-center items-center py-10 text-2xl"><p>No turfs with Selected filter</p></div>}
             <div className="grid grid-cols-1 md:grid-cols-2 md:p-10 md:m-2 lg:grid-cols-3 gap-4">
-              {turfs.map((turf, i) => (
+              {filteredAndSortedTurfs.map((turf, i) => (
                 <TurfCard
                   key={`${turf.name}-${i}`}
                   name={turf.name}
@@ -215,6 +395,7 @@ export default function Turfs() {
                   rate={turf.rate}
                 />
               ))}
+
             </div>
           </div>
 
