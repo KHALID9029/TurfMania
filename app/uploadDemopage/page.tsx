@@ -31,6 +31,7 @@ export default function Home() {
     for (const file of uploadFiles) {
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("subFolder", "Demo"); // specify subfolder if needed
 
       const response = await fetch("/api/fileupload", {
         method: "POST",
@@ -48,7 +49,9 @@ export default function Home() {
         continue;
       }
 
-      const fileUrl = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${data.publicId}`;
+      //const fileUrl = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${data.publicId}`;
+      const fileUrl = data.secure_url;
+      console.log(`File uploaded: ${fileUrl}`);
       uploadedLinks.push(fileUrl);
     }
 
