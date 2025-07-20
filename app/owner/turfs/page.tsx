@@ -2,46 +2,46 @@
 
 import Sidebar from "@/components/bars/sidebar"
 import TurfCard from "@/components/turfCard"
-import { useRouter } from "next/navigation"
+import { redirect, useRouter } from "next/navigation"
+import React, { useEffect, useState } from "react";
+import { useSession } from "next-auth/react"
+import TurfDto from "@/dto/turfDto"
 
-const turfs = [
-    {
-        name: "ChattoTurf",
-        location: "Chittagong",
-        image: "/images/turf1.png",
-        amenities: ["Washroom", "Locker", "Shower"],
-        rating: 4.5,
-        rate: 800
-    },
-    {
-        name: "ChattoTurf",
-        location: "Chittagong",
-        image: "/images/turf1.png",
-        amenities: ["Washroom", "Locker", "Shower"],
-        rating: 4.5,
-        rate: 800
-    },
-    {
-        name: "ChattoTurf",
-        location: "Chittagong",
-        image: "/images/turf1.png",
-        amenities: ["Washroom", "Locker", "Shower"],
-        rating: 4.5,
-        rate: 800
-    },
-    {
-        name: "ChattoTurf",
-        location: "Chittagong",
-        image: "/images/turf1.png",
-        amenities: ["Washroom", "Locker", "Shower"],
-        rating: 4.5,
-        rate: 800
-    },
+const fetchTurfs = async (ownerId: number) =>  {
+    try {
+        const response = await fetch(`/api/turf?ownerId=${ownerId}`, {
+            method: 'GET',
+        });
 
-]
+        if (!response.ok) {
+            throw new Error("Failed to fetch turfs");
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching turfs:", error);
+        return [];
+    }
+}
+
+
 
 export default function Turf() {
     const router = useRouter()
+    const { data: session } = useSession()
+    const [turfs, setTurfs] = useState<TurfDto[]>([]);
+
+    useEffect(() => {
+        if (session && session.user) {
+            const ownerId = parseInt(session.user.id);
+            fetchTurfs(ownerId).then((data) => setTurfs(data));
+        }
+    }, [session]);
+
+    if (!session || !session.user) {
+        redirect("/403")
+    }
 
     const handleAddTurf = () => {
         router.push("/owner/addTurf")
@@ -73,12 +73,12 @@ export default function Turf() {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {turfs.map((turf, i) => (
                                 <TurfCard
-                                    key={`${turf.name}-${i}`}
-                                    name={turf.name}
-                                    location={turf.location}
-                                    imageUrl={turf.image}
-                                    amenities={turf.amenities}
-                                    rating={turf.rating}
+                                    key={`${turf.turfName}-${i}`}
+                                    name={turf.turfName}
+                                    location={turf.city}
+                                    imageUrl={turf.photos && turf.photos.length > 0 ? turf.photos[0] : "/images/turf1.png"}
+                                    amenities={turf.amenities ?? []}
+                                    rating={turf.rating?? 0}
                                     rate={turf.rate}
                                 />
                             ))}
