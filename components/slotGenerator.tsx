@@ -30,9 +30,13 @@ function formatTime(date: Date): string {
 }
 
 const TimeSlots: React.FC<TimeSlotProps> = ({ open, close }) => {
+    
+    console.log(open, close);
+    
     const startTime = parseTime(open);
     const endTime = parseTime(close);
 
+    
     const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
 
     const slots: string[] = [];

@@ -76,7 +76,7 @@ export async function getReviewsByUserId(userID: number) {
 export async function getReviewsByTurfId(turfID: number) {
     try {
         await connectDB();
-        const reviews = await Review.find({ ownerId: turfID });
+        const reviews = await Review.find({ turfId: turfID });
         if (!reviews || reviews.length === 0) {
             return NextResponse.json({ error: "No reviews found for this turf" }, { status: 404 });
         }

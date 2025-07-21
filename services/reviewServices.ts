@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { IReview } from "@/models/Review";
-
+import Review from "@/models/Review";
 import {
     getAllReviews,
     getReviewById,
@@ -12,6 +12,9 @@ import {
     deleteReview,
 } from "@/repositories/reviewRepository";
 import ReviewDto from "@/dto/reviewDto";
+
+import { putTurf } from "@/repositories/turfRepository";
+
 
 export async function getAllReviewsService(req: NextRequest) {
     return getAllReviews(req);
@@ -46,10 +49,20 @@ export async function getReviewsByTurfIdService(turfId: number) {
     return getReviewsByTurfId(turfId);
 }
 
-export async function postReviewService(Review: IReview) {
+export async function postReviewService(rev: IReview) {
 
 
-    return postReview(Review);
+
+    const res = await postReview(rev); // fix: added await
+
+    const allReviews = await Review.find({ turfId: rev.turfId });
+
+    const totalRating = allReviews.reduce((acc, r) => acc + r.rating, 0);
+    const avgRating = allReviews.length > 0 ? totalRating / allReviews.length : 0;
+
+    await putTurf(rev.turfId, { rating: avgRating });
+
+    return res;
 }
 
 export async function putReviewService(id: number, reviewDto: ReviewDto) {
@@ -69,7 +82,18 @@ export async function putReviewService(id: number, reviewDto: ReviewDto) {
             Object.entries(updateData).filter(([key, value]) => key !== '_id' && value !== undefined && value !== null)
         );
 
-        return putReview(id, updateReviewData);
+
+        const res = await putReview(id, updateReviewData);
+
+        const allReviews = await Review.find({ turfId: reviewDto.turfId });
+
+        const totalRating = allReviews.reduce((acc, r) => acc + r.rating, 0);
+        const avgRating = allReviews.length > 0 ? totalRating / allReviews.length : 0;
+
+        await putTurf(reviewDto.turfId, { rating: avgRating });
+
+        return res;
+
     } catch (error) {
         console.error("Error updating review:", error);
         return NextResponse.json({ error: "Failed to update review" }, { status: 500 });

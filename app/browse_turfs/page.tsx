@@ -66,6 +66,7 @@ export default function Turfs() {
       if (newIndex > maxIndex) newIndex = 0; // wrap to first
     }
 
+    console.log("Scrolling to index:", newIndex);
     scrollRef.current.scrollTo({
       left: newIndex * cardWidth,
       behavior: "smooth",

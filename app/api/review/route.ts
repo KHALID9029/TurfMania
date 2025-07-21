@@ -23,7 +23,7 @@ async function parseRequestToReviewDto(data: FormData) {
     userId: parseInt(data.get('userId') as string),
     name: data.get('name') as string,
     rating: parseFloat(data.get('rating') as string),
-    text: data.get('comment') as string,  // 'comment' from form, mapped to 'text'
+    text: data.get('text') as string,  // 'comment' from form, mapped to 'text'
     date: data.get('date') ? new Date(data.get('date') as string) : new Date(),
   };
 
@@ -50,6 +50,8 @@ export async function GET(req: NextRequest) {
 
   const turfId = searchParams.get('turfId');
   const turfIdInt = parseInt(turfId as string) || 0;
+
+   console.log("Extracted turfId in num:", turfIdInt);
 
   const userId = searchParams.get('userId');
   const userIdInt = parseInt(userId as string) || 0;
@@ -107,6 +109,7 @@ export async function PUT(req: NextRequest) {
   const data = await req.formData();
   const reviewDto = await parseRequestToReviewDto(data);
 
+  console.log(id);
   if (!reviewDto || !id) {
     return NextResponse.json({ error: "Invalid review data or ID" }, { status: 400 });
   }

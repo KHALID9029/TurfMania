@@ -16,6 +16,7 @@ export function toTurfDto(turf: ITurf): TurfDto {
         turfSize: turf.turfSize,
         rate: turf.rate,
         lat: turf.lat,
-        lng: turf.lng
+        lng: turf.lng,
+        rating: turf.rating
     };
 }

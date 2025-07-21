@@ -24,8 +24,7 @@ const ReviewSchema: Schema = new Schema(
     }
 );
 
-// Enforce "one review per user per turf"
-ReviewSchema.index({ userId: 1, turfId: 1 }, { unique: true });
+
 
 ReviewSchema.pre<IReview>("save", async function (next) {
     if (!this.reviewId) {

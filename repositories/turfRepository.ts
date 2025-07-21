@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongoose";
-import Turf, {ITurf} from "@/models/Turf";
+import Turf, { ITurf } from "@/models/Turf";
 import { toTurfDto } from "@/mapper/turfMapper";
 
 /** GET: Fetches all users from the database**/
-export async function getAllTurfs(req: NextRequest){
+export async function getAllTurfs(req: NextRequest) {
     console.log(req);
-    try{
+    try {
         await connectDB();
         const turfs = await Turf.find();
         const turfDtos = turfs.map(turf => {
@@ -14,7 +14,7 @@ export async function getAllTurfs(req: NextRequest){
         }
         );
         return NextResponse.json(turfDtos, { status: 200 });
-    }catch (error) {
+    } catch (error) {
         console.error("Error fetching Turfs:", error);
         return NextResponse.json({ error: "Failed to fetch Turfs" }, { status: 500 });
     }
@@ -22,10 +22,10 @@ export async function getAllTurfs(req: NextRequest){
 
 
 
-export async function getTurfById(id: number){
+export async function getTurfById(id: number) {
     try {
         await connectDB();
-        const turf = await Turf.findOne({ turfId: id });           
+        const turf = await Turf.findOne({ turfId: id });
         if (!turf) {
             return NextResponse.json({ error: "Turf not found" }, { status: 404 });
         }
@@ -72,13 +72,13 @@ export async function getTurfsByOwnerId(ownerId: number) {
 
 /** POST: Creates a new user in the database **/
 export async function postTurf(turf: ITurf) {
-    try{
+    try {
         await connectDB();
         const newTurf = await Turf.create(turf);
         console.log("New Turf created:", newTurf);
         const turfDto = toTurfDto(newTurf);
         return NextResponse.json(turfDto, { status: 201 });
-    }catch (error) {
+    } catch (error) {
         console.error("Error creating turf:", error);
         return NextResponse.json({ error: "Failed to create turf" }, { status: 500 });
     }
@@ -89,6 +89,27 @@ export async function postTurf(turf: ITurf) {
 export async function putTurf(id: number, updateData: Partial<ITurf>) {
     try {
         await connectDB();
+
+
+        const numericFields = [
+            'ownerId',
+            'turfSize',
+            'rate',
+            'lat',
+            'lng',
+            'rating',
+        ];
+
+        for (const field of numericFields) {
+            if (field in updateData) {
+                const value = updateData[field as keyof Partial<ITurf>];
+                if (value === undefined || value === null || Number.isNaN(value as number)) {
+                    delete updateData[field as keyof Partial<ITurf>];
+                }
+            }
+        }
+
+
         const updatedTurf = await Turf.findOneAndUpdate({ turfId: id }, updateData, {
             new: true, // Return the updated document
             runValidators: true // Validate the update against the schema

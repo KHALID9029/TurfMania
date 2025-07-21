@@ -12,7 +12,7 @@ import { getFormattedAddress } from "@/lib/utils";
 import DatePickerInput from "@/components/datePicker";
 import { useSession } from "next-auth/react";
 import { Pencil } from "lucide-react";
-
+import ReviewDto from "@/dto/reviewDto";
 export default function TurfPage() {
     const { id } = useParams();
     const [turf, setTurf] = useState<TurfDto>();
@@ -23,6 +23,19 @@ export default function TurfPage() {
     const [mainImage, setMainImage] = useState("/images/turf1.png");
 
     const [formattedAddress, setFormattedAddress] = useState<string | null>(null);
+
+    //Rating logic
+    const [rating, setRating] = useState<number>(0);
+
+    const [reviewText, setReviewText] = useState<string>("");
+
+    const [reviews, setReviews] = useState<ReviewDto[]>([]);
+
+    const [userReview, setUserReview] = useState<ReviewDto | null>(null);
+
+    const [editMode, setEditMode] = useState(false);
+
+
     useEffect(() => {
         if (!turf) return;
 
@@ -37,19 +50,31 @@ export default function TurfPage() {
         fetchAddress();
     }, [turf]);
 
+
     useEffect(() => {
         if (!id) return;
-        async function fetchTurf() {
+
+        async function fetchTurfAndReviews() {
             try {
                 const res = await fetch(`/api/turf?id=${id}`);
                 const data = await res.json();
                 setTurf(data);
                 setMainImage(data.photos?.[0] || "/images/turf1.png");
+
+                const reviewRes = await fetch(`/api/review?turfId=${data.turfId}`);
+                const reviewData = await reviewRes.json();
+                if (Array.isArray(reviewData)) {
+                    setReviews(reviewData);
+                } else {
+                    console.warn("Unexpected review data:", reviewData);
+                    setReviews([]); // fallback to empty array
+                }
             } catch (err) {
-                console.error("Failed to load turf", err);
+                console.error("Failed to load turf or reviews", err);
             }
         }
-        fetchTurf();
+
+        fetchTurfAndReviews();
     }, [id]);
 
 
@@ -63,50 +88,46 @@ export default function TurfPage() {
     };
 
 
-    //Rating logic
-    const [rating, setRating] = useState<number>(0);
 
-    const [reviewText, setReviewText] = useState<string>("");
 
-    const [reviews, setReviews] = useState<Review[]>([]);
 
-    interface Review {
-        reviewId?: number;           // unique review ID
-        userId: number | undefined;       // ID of the user who submitted the review
-        turfId:number | undefined;       // ID of the turf being reviewed
-        name: string;         // Name of the reviewer
-        rating: number;       // Rating (1–5)
-        text?: string;         // Review text
-        date: string;         // Submission date
-    }
+    const handleSubmitReview = async () => {
+        if (!reviewText || rating === 0 || !session?.user?.userId || !turf?.turfId) return;
 
-    const handleSubmitReview = () => {
-        if (!reviewText || rating === 0) return;
+        const formData = new FormData();
+        formData.append("userId", String(session.user.userId));
+        formData.append("turfId", String(turf.turfId));
+        formData.append("name", session.user.name || "Anonymous");
+        formData.append("rating", String(rating));
+        formData.append("text", reviewText);
+        formData.append("date", new Date().toISOString());
 
-        const newReview: Review = {
-            
-            userId: session?.user.userId,
-            name: session?.user.name || "Anonymous",
-            rating,
-            turfId: turf?.turfId,
-            text: reviewText,
-            date: new Date().toLocaleDateString(),
-        };
+        try {
+            const res = await fetch("/api/review", {
+                method: "POST",
+                body: formData,
+            });
 
-        console.log("Submitting review:", newReview);
+            if (!res.ok) throw new Error("Failed to submit review");
 
-        setReviews((prev) => [newReview, ...prev]);
-        setReviewText("");
-        setRating(0);
+            const submittedReview = await res.json();
+
+            setReviews((prev) => [submittedReview, ...prev]);
+            setReviewText("");
+           
+            setRating(0);
+        } catch (err) {
+            console.error("Review submission failed:", err);
+        }
     };
 
 
-    const [userReview, setUserReview] = useState<Review | null>(null);
-    const [editMode, setEditMode] = useState(false);
+
+
 
 
     // Update local user review and reflect in reviews array
-    const updateUserReview = (updated: Review) => {
+    const updateUserReview = (updated: ReviewDto) => {
         setUserReview(updated);
         setReviews((prev) =>
             prev.map((r) => (r.userId === session?.user.userId ? updated : r))
@@ -114,10 +135,33 @@ export default function TurfPage() {
     };
 
     // Save changes (e.g. to backend or local confirmation)
-    const saveUserReview = (review: Review) => {
-        console.log("Updated review saved:", review);
-        // Optionally: Send PATCH/PUT to server here
+    const saveUserReview = async (review: ReviewDto) => {
+        if (!review.id) return;
+
+        const formData = new FormData();
+        formData.append("reviewId", String(review.id));
+        formData.append("userId", String(review.userId));
+        formData.append("turfId", String(review.turfId));
+        formData.append("name", review.name);
+        formData.append("rating", String(review.rating));
+        formData.append("text", review.text || "");
+        formData.append("date", new Date().toISOString());
+
+        try {
+            const res = await fetch(`/api/review?reviewId=${review.id}`, {
+                method: "PUT",
+                body: formData,
+            });
+
+            if (!res.ok) throw new Error("Failed to update review");
+
+            const updated = await res.json();
+            updateUserReview(updated);
+        } catch (err) {
+            console.error("Review update failed:", err);
+        }
     };
+
 
 
     useEffect(() => {
@@ -133,7 +177,20 @@ export default function TurfPage() {
 
     return (
         <div className="bg-black text-white p-6 md:p-10 min-h-screen">
-            <h1 className="text-3xl font-bold mb-2">{turf.turfName} <span className="text-yellow-400">★★★★★</span></h1>
+
+            <div className="flex gap-2 items-center mb-2">
+                <h1 className="text-2xl font-bold">{turf.turfName}
+                </h1>
+                <div className="flex text-yellow-400 text-2xl">
+                    {Array.from({ length: 5 }, (_, i) => {
+                        const starNumber = i + 1;
+                        const turfRating = turf.rating || 0;
+                        if (turfRating >= starNumber) return <span key={i}>★</span>;
+                        else if (turfRating >= starNumber - 0.5) return <span key={i}>⯨</span>;
+                        else return <span key={i}>☆</span>;
+                    })}
+                </div>
+            </div>
 
             <div className="flex flex-col md:flex-row gap-6">
                 {/* Left section */}
@@ -241,7 +298,7 @@ export default function TurfPage() {
                                         />
                                         <div className="flex flex-col">
                                             <span className="font-semibold">{userReview.name}</span>
-                                            <span className="text-xs text-gray-400">{userReview.date}</span>
+                                            <span className="text-xs text-gray-400">{userReview.date.toLocaleString()}</span>
                                         </div>
                                     </div>
 
@@ -254,7 +311,7 @@ export default function TurfPage() {
                                                     size={20}
                                                     className={`cursor-pointer transition ${star <= userReview.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-500"}`}
                                                     onClick={() => {
-                                                        const updatedReview = { ...userReview, rating: star, date: new Date().toLocaleDateString() };
+                                                        const updatedReview = { ...userReview, rating: star, date: new Date() };
                                                         updateUserReview(updatedReview);
                                                     }}
                                                 />
@@ -286,7 +343,7 @@ export default function TurfPage() {
                                             className="w-full bg-[#1e1e1e] border border-gray-700 text-white rounded p-3 mt-3 min-h-[100px]"
                                             value={userReview.text}
                                             onChange={(e) => {
-                                                const updatedReview = { ...userReview, text: e.target.value, date: new Date().toLocaleDateString()  };
+                                                const updatedReview = { ...userReview, text: e.target.value ? e.target.value : "", date: new Date() };
                                                 updateUserReview(updatedReview);
                                             }}
                                         />
@@ -295,6 +352,7 @@ export default function TurfPage() {
                                             onClick={() => {
                                                 saveUserReview(userReview);
                                                 setEditMode(false);
+
                                             }}
                                         >
                                             Save Changes
@@ -319,7 +377,7 @@ export default function TurfPage() {
                         ) : (
                             reviews
                                 .filter((review) => review.userId !== session?.user?.userId)
-                                .map((review,index) => (
+                                .map((review, index) => (
                                     <div key={index} className="bg-[#1e1e1e] rounded p-4 mt-2">
                                         <div className="flex items-center gap-2 mb-1">
                                             <Image
@@ -330,8 +388,9 @@ export default function TurfPage() {
                                                 className="rounded-full"
                                             />
                                             <div className="flex flex-col">
-                                                <span className="font-semibold">{review.name}</span>
-                                                <span className="text-xs text-gray-400">{review.date}</span>
+                                                <span className="">{review.name}<span className="text-gray-400 text-sm"> UID: {review.userId}</span>
+                                                </span>
+                                                <span className="text-xs text-gray-400">{review.date.toLocaleString()}</span>
                                             </div>
                                             <div className="ml-auto flex gap-0.5">
                                                 {[1, 2, 3, 4, 5].map((i) => (
