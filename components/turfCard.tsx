@@ -7,15 +7,18 @@ type TurfProps = {
   amenities: string[];
   rating: number;
   rate: number; // rate per hour
+   onClick?: () => void; // Optional click handler for the card
 };
 
-const TurfCard = ({ name, location, imageUrl, amenities, rating, rate }: TurfProps) => {
+const TurfCard = ({ name, location, imageUrl, amenities, rating, rate,onClick }: TurfProps) => {
   const visibleAmenities = amenities.slice(0, 3);
   const remainingCount = amenities.length - visibleAmenities.length;
 
   return (
 
-    <div className="bg-[#2a2a2a] rounded-xl overflow-hidden shadow-md hover:scale-105 transition-transform duration-300 flex flex-col h-full">
+    <div
+    onClick={onClick}
+     className="bg-[#2a2a2a] rounded-xl overflow-hidden shadow-md hover:scale-105 transition-transform duration-300 flex flex-col h-full">
   <FadeContent blur={true} duration={1000} easing="ease-out" initialOpacity={0}>
     <img src={imageUrl} alt={name} className="w-full h-48 object-cover" />
     <div className="p-4 text-white flex flex-col flex-grow">

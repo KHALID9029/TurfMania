@@ -44,7 +44,7 @@ export async function postTurfService(Turf: ITurf) {
     return postTurf(Turf);
 }
 
-export async function putTurfService(id: number, turfDto: turfDto) {
+export async function putTurfService(id: number, turfDto: Partial<ITurf>) {
 
     const updateData: Partial<ITurf> = turfDto;
 
@@ -60,7 +60,7 @@ export async function putTurfService(id: number, turfDto: turfDto) {
         const updateTurfData: Partial<ITurf> = Object.fromEntries(
             Object.entries(updateData).filter(([key, value]) => key !== '_id' && value !== undefined && value !== null)
         );
-
+        
         return putTurf(id, updateTurfData);
     } catch (error) {
         console.error("Error updating Turf:", error);
