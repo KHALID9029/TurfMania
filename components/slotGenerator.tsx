@@ -5,6 +5,7 @@ type TimeSlotProps = {
     close: string;
     selectedSlots: string[];
     setSelectedSlots: React.Dispatch<React.SetStateAction<string[]>>;
+
 };
 
 function parseTime(timeStr: string): Date {
@@ -25,6 +26,19 @@ function formatTime(date: Date): string {
     const minutesStr = minutes < 10 ? "0" + minutes : minutes;
     return `${hours}:${minutesStr} ${ampm}`;
 }
+
+function formatSingleTimeRange(input: string): string {
+    const [start, end] = input.split('-').map(part => part.trim());
+    const [startTime, startPeriod] = start.split(' ');
+    const [endTime, endPeriod] = end.split(' ');
+
+    if (startPeriod === endPeriod) {
+        return `(${startTime} - ${endTime}) ${startPeriod}`;
+    } else {
+        return input; // Keep original if AM and PM differ
+    }
+}
+
 
 const TimeSlots: React.FC<TimeSlotProps> = ({ open, close, selectedSlots, setSelectedSlots }) => {
     const startTime = parseTime(open);
@@ -53,12 +67,13 @@ const TimeSlots: React.FC<TimeSlotProps> = ({ open, close, selectedSlots, setSel
                     <div
                         key={i}
                         onClick={() => toggleSlot(slot)}
-                        className={`cursor-pointer rounded p-2 text-center text-[8px] md:text-sm transition h-full
+                        className={`cursor-pointer rounded p-2 text-center text-[8px] md:text-sm transition 
+      h-10 md:h-15 flex items-center justify-center
                             ${selectedSlots.includes(slot)
                                 ? "bg-green-600 text-white"
                                 : "bg-gray-400 text-black hover:bg-gray-500"}`}
                     >
-                        {slot}
+                        {formatSingleTimeRange(slot)}
                     </div>
                 ))}
             </div>
