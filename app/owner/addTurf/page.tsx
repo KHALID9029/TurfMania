@@ -81,6 +81,7 @@ export default function AddTurf() {
       ...prev,
       [field]: value,
     }));
+        console.log(formData);
   };
 
   interface AmenityToggleHandler {
@@ -107,6 +108,7 @@ export default function AddTurf() {
       ...prev,
       [field]: formatted,
     }));
+
   };
 
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);

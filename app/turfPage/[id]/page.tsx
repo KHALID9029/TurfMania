@@ -13,7 +13,8 @@ import { useSession } from "next-auth/react";
 import { Pencil } from "lucide-react";
 import ReviewDto from "@/dto/reviewDto";
 import Stepper, { Step } from "@/components/stepper";
-import { set } from "mongoose";
+
+import FadeContent from "@/components/fadeContent";
 export default function TurfPage() {
     const { id } = useParams();
     const [turf, setTurf] = useState<TurfDto>();
@@ -183,7 +184,8 @@ export default function TurfPage() {
 
     return (
         <div className="bg-black text-white p-6 md:p-10 min-h-screen">
-           {session?.user && ( <button
+
+            {session?.user && (<button
                 onClick={() => setShowStepper(prev => !prev)}
                 className="fixed bottom-4 right-4 z-40 bg-green-600 hover:bg-green-700 text-white p-4 rounded-full shadow-xl block lg:hidden"
             >
@@ -220,6 +222,7 @@ export default function TurfPage() {
                             </Step>
                             <Step>
                                 <h2>Select Slots</h2>
+                                <h6>Price per hour: {turf.rate}</h6>
                                 <TimeSlots
                                     open={turf.open}
                                     close={turf.close}
@@ -254,9 +257,12 @@ export default function TurfPage() {
                 </div>
             </div>
 
+
+
             <div className="flex flex-col md:flex-row gap-6">
                 {/* Left section */}
                 <div className="flex-1">
+
                     <div className="w-full aspect-video relative rounded overflow-hidden">
                         <Image
                             src={mainImage || "/images/turf1.png"}
@@ -285,9 +291,18 @@ export default function TurfPage() {
                         )}
                     </div>
 
+                    <div className="mt-4"><strong >Amenities:</strong> </div>
+                    <p className="flex flex-wrap gap-2 mt-4 text-gray-300">
+                        
 
-                    <p className="mt-4 text-gray-300">
-                        <strong>Amenities:</strong> {turf.amenities?.join(", ")}
+                        {turf.amenities?.map((amenity, idx) => (
+                            <span
+                                key={idx}
+                                className="bg-gray-700 text-gray-200 text-[10px] md:text-[10px] px-2 py-0.5 rounded-full h-full"
+                            >
+                                {amenity}
+                            </span>
+                        ))}
                     </p>
 
                     <div className="mt-4">
@@ -475,11 +490,11 @@ export default function TurfPage() {
 
                 {/* Right section */}
                 {session?.user && (
-                    <div className="w-full md:w-1/3 bg-[#1e1e1e] rounded p-4 flex flex-col items-center h-fit sticky top-5 self-start hidden lg:block">
-                        <p className="text-sm text-gray-400">
+                    <div className="w-full md:w-2/5 bg-[#1e1e1e] rounded p-4 flex flex-col items-center h-fit sticky top-5 self-start hidden lg:block">
+                        <p className="text-sm md:text-md text-gray-400 mb-2">
                             Cost Per Hour: <span className="text-white font-bold">{turf.rate} bdt</span>
                         </p>
-
+                        <hr />
                         <label className="text-sm mt-4 text-white w-full">Select Date:</label>
 
                         <DatePickerInput onDateSelect={handleDateSelect} initialDate={selectedDate} />
@@ -499,6 +514,6 @@ export default function TurfPage() {
                 )
                 }
             </div>
-        </div>
+        </div >
     );
 }

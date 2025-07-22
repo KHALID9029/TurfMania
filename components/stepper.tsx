@@ -118,8 +118,7 @@ export default function Stepper({
                                         step: stepNumber,
                                         currentStep,
                                         onStepClick: (clicked) => {
-                                            setDirection(clicked > currentStep ? 1 : -1);
-                                            updateStep(clicked);
+                                        
                                         },
                                     })
                                 ) : (
@@ -128,8 +127,8 @@ export default function Stepper({
                                         disableStepIndicators={disableStepIndicators}
                                         currentStep={currentStep}
                                         onClickStep={(clicked) => {
-                                            setDirection(clicked > currentStep ? 1 : -1);
-                                            updateStep(clicked);
+                                       
+                                           
                                         }}
                                     />
                                 )}
