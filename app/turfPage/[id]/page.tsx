@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { MapPin } from "lucide-react";
-import dynamic from "next/dynamic";
 import { Star, StarHalf } from "lucide-react";
 import TurfDto from "@/dto/turfDto";
 import TimeSlots from "@/components/slotGenerator";
@@ -13,6 +12,8 @@ import DatePickerInput from "@/components/datePicker";
 import { useSession } from "next-auth/react";
 import { Pencil } from "lucide-react";
 import ReviewDto from "@/dto/reviewDto";
+import Stepper, { Step } from "@/components/stepper";
+import { set } from "mongoose";
 export default function TurfPage() {
     const { id } = useParams();
     const [turf, setTurf] = useState<TurfDto>();
@@ -34,6 +35,11 @@ export default function TurfPage() {
     const [userReview, setUserReview] = useState<ReviewDto | null>(null);
 
     const [editMode, setEditMode] = useState(false);
+
+    //This is Not connected to backed yet
+    const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
+
+    const [showStepper, setShowStepper] = useState(false);
 
 
     useEffect(() => {
@@ -114,7 +120,7 @@ export default function TurfPage() {
 
             setReviews((prev) => [submittedReview, ...prev]);
             setReviewText("");
-           
+
             setRating(0);
         } catch (err) {
             console.error("Review submission failed:", err);
@@ -177,6 +183,62 @@ export default function TurfPage() {
 
     return (
         <div className="bg-black text-white p-6 md:p-10 min-h-screen">
+           {session?.user && ( <button
+                onClick={() => setShowStepper(prev => !prev)}
+                className="fixed bottom-4 right-4 z-40 bg-green-600 hover:bg-green-700 text-white p-4 rounded-full shadow-xl block lg:hidden"
+            >
+                Book Now
+            </button>)}
+
+            {showStepper && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm block lg:hidden">
+                    <div className="relative bg-transparent text-white w-11/12 max-w-md  text-center px-4 py-6">
+
+                        {/* Stepper */}
+                        <Stepper
+                            initialStep={1}
+                            onStepChange={(step) => {
+                                console.log(step);
+                            }}
+                            onFinalStepCompleted={() => setShowStepper(false)}
+                            canGoToNextStep={(step) => {
+                                if (step === 1) {
+                                    return selectedDate !== undefined;
+                                }
+                                if (step === 2) {
+                                    return selectedSlots.length > 0;
+                                }
+                                return true;
+                            }}
+                            onClose={() => setShowStepper(false)}
+                            backButtonText="Previous"
+                            nextButtonText="Next"
+                        >
+                            <Step>
+                                <h2>Select date</h2>
+                                <DatePickerInput onDateSelect={handleDateSelect} initialDate={selectedDate} />
+                            </Step>
+                            <Step>
+                                <h2>Select Slots</h2>
+                                <TimeSlots
+                                    open={turf.open}
+                                    close={turf.close}
+                                    selectedSlots={selectedSlots}
+                                    setSelectedSlots={setSelectedSlots}
+                                />
+                            </Step>
+                            <Step>
+                                <p>Slot Booked!</p>
+                                {selectedSlots.map((slot, index) => (
+                                    <p key={index} className="text-sm text-gray-300">{slot}</p>
+                                ))}
+                            </Step>
+                        </Stepper>
+                    </div>
+                </div>
+
+            )}
+
 
             <div className="flex gap-2 items-center mb-2">
                 <h1 className="text-2xl font-bold">{turf.turfName}
@@ -195,14 +257,15 @@ export default function TurfPage() {
             <div className="flex flex-col md:flex-row gap-6">
                 {/* Left section */}
                 <div className="flex-1">
-                    <div className="w-full h-100 relative rounded overflow-hidden">
+                    <div className="w-full aspect-video relative rounded overflow-hidden">
                         <Image
                             src={mainImage || "/images/turf1.png"}
                             alt="Turf"
                             fill
-                            className="object-contain"
+                            className="object-cover"
                         />
                     </div>
+
                     <div className="flex gap-2 mt-2">
                         {turf.photos?.slice(0, 4).map((url, i) => (
                             <Image
@@ -388,9 +451,9 @@ export default function TurfPage() {
                                                 className="rounded-full"
                                             />
                                             <div className="flex flex-col">
-                                                <span className="">{review.name}<span className="text-gray-400 text-sm"> UID: {review.userId}</span>
+                                                <span className=" text-sm md:text-xl">{review.name}<span className="text-gray-400 text-xs md:text-sm"> UID: {review.userId}</span>
                                                 </span>
-                                                <span className="text-xs text-gray-400">{review.date.toLocaleString()}</span>
+                                                <span className="text-[8px] md:text-xs text-gray-400">{review.date.toLocaleString()}</span>
                                             </div>
                                             <div className="ml-auto flex gap-0.5">
                                                 {[1, 2, 3, 4, 5].map((i) => (
@@ -411,23 +474,30 @@ export default function TurfPage() {
                 </div>
 
                 {/* Right section */}
-                <div className="w-full md:w-1/3 bg-[#1e1e1e] rounded p-4 flex flex-col items-center h-fit sticky top-5 self-start hidden lg:block">
-                    <p className="text-sm text-gray-400">
-                        Cost Per Hour: <span className="text-white font-bold">{turf.rate} bdt</span>
-                    </p>
+                {session?.user && (
+                    <div className="w-full md:w-1/3 bg-[#1e1e1e] rounded p-4 flex flex-col items-center h-fit sticky top-5 self-start hidden lg:block">
+                        <p className="text-sm text-gray-400">
+                            Cost Per Hour: <span className="text-white font-bold">{turf.rate} bdt</span>
+                        </p>
 
-                    <label className="text-sm mt-4 text-white w-full">Select Date:</label>
+                        <label className="text-sm mt-4 text-white w-full">Select Date:</label>
 
-                    <DatePickerInput onDateSelect={handleDateSelect} initialDate={selectedDate} />
-                    <div className="w-full mt-4 ">
-                        <TimeSlots open={turf.open} close={turf.close} />
+                        <DatePickerInput onDateSelect={handleDateSelect} initialDate={selectedDate} />
+                        <div className="w-full mt-4 ">
+                            <TimeSlots
+                                open={turf.open}
+                                close={turf.close}
+                                selectedSlots={selectedSlots}
+                                setSelectedSlots={setSelectedSlots}
+                            />
+                        </div>
+
+                        <button className="mt-4 w-full py-2 bg-green-600 rounded hover:bg-green-700">
+                            Confirm
+                        </button>
                     </div>
-
-                    <button className="mt-4 w-full py-2 bg-green-600 rounded hover:bg-green-700">
-                        Confirm
-                    </button>
-                </div>
-
+                )
+                }
             </div>
         </div>
     );
