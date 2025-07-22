@@ -31,7 +31,7 @@ async function parseRequestToTurfDto(data: FormData) {
     }
   }
   const body = {
-    turfId: parseInt(data.get('turfId') as string) || 0,
+    
     turfName: data.get('turfName') as string,
     ownerId: parseInt(data.get('ownerId') as string),
     photos,
@@ -45,10 +45,11 @@ async function parseRequestToTurfDto(data: FormData) {
     rate: parseFloat(data.get('rate') as string),
     lat: parseFloat(data.get('lat') as string),
     lng: parseFloat(data.get('lng') as string),
+    rating: parseFloat(data.get('rating') as string) || 0, 
   };
 
   return {
-    turfId: body.turfId,
+
     turfName: body.turfName,
     ownerId: body.ownerId,
     photos: body.photos,
@@ -61,7 +62,8 @@ async function parseRequestToTurfDto(data: FormData) {
     turfSize: body.turfSize,
     rate: body.rate,
     lat: body.lat,
-    lng: body.lng
+    lng: body.lng,
+    rating: body.rating
   };
 }
 
@@ -114,6 +116,7 @@ export async function PUT(req: NextRequest) {
   const id = searchParams.get('id');
   const turfId = parseInt(id as string) || 0;
 
+    console.log("Received turfId in PUT:", turfId);
   const data = await req.formData();
   const turfDto = await parseRequestToTurfDto(data);
 
