@@ -11,6 +11,7 @@ export function toUserDto(user: IUser): UserDto {
         role: user.role,
         street: user.street,
         postCode: user.postCode,
-        city: user.city
+        city: user.city,
+        profilePicture: user.profilePicture // Optional profile picture field
     };
 }

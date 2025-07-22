@@ -2,10 +2,10 @@
 
 import { Pencil } from "lucide-react";
 import React from "react";
-import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import UserDto from "@/dto/userDto";
 import Image from "next/image";
+import { useParams } from "next/navigation";
 
 import Navbar from "@/components/bars/navbar";
 import FadeContent from "@/components/fadeContent";
@@ -14,42 +14,32 @@ import {Modal} from "@mui/material";
 import Box from "@mui/material/Box";
 import { CircularProgress } from "@mui/material";
 
-const fetchUserInfo = async (userId: number) => {
-    try {
-        const response = await fetch(`/api/users?id=${userId}`, {
-            method: 'GET',
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to fetch user info");
-        }
-
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error("Error fetching user info:", error);
-        return null;
-    }
-}
-
 const PlayerAccountPage: React.FC = () => {
 
-    const { data: session } = useSession();
+    const { id } = useParams();
     const [userInfo, setUserInfo] = useState<UserDto>();
     const [openModal, setOpenModal] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
-        if (session && session.user) {
-            const userId = session.user.userId;
-            if (!userId) {
-                console.error("User ID is not available in session");
-                return;
+        if(!id) return;
+        async function fetchUser(){
+            try{
+                const res = await fetch(`/api/users?id=${id}`);
+                const data = await res.json();
+                if (res.ok) {
+                    setUserInfo(data);
+                } else {
+                    throw new Error("Failed to fetch user data");
+                }
+            }catch (error) {
+                console.error("Error fetching user data:", error);
+                toast.error("Failed to load user data");
             }
-            fetchUserInfo(userId).then((data) => setUserInfo(data));
         }
-    }, [session]);
+        fetchUser();
+    }, [id]);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -67,18 +57,19 @@ const PlayerAccountPage: React.FC = () => {
 
         try {
             const res = await fetch("/api/fileupload", {
-        method: "POST",
-        body: formData,
-      });
+            method: "POST",
+            body: formData,
+        });
 
             const data = await res.json();
 
             if (data.secure_url) {
+                const previousProfilePicture = userInfo.profilePicture;
                 // Send the new URL to your backend to update the user profile picture
                 const formData = new FormData();
                 formData.set("profilePicture", data.secure_url);
 
-                const response = await fetch(`/api/users?id=${session?.user.userId}`, {
+                const response = await fetch(`/api/users?id=${id}`, {
                     method: 'PUT',
                     body:formData,
                 })
@@ -88,6 +79,15 @@ const PlayerAccountPage: React.FC = () => {
                 }
                 else {
                     toast.success("Profile picture updated successfully");
+                    // Delete the previous profile picture if it exists
+                    if (previousProfilePicture && previousProfilePicture !== "/images/default-profile.png") {
+                        const formData = new FormData();
+                        formData.append("fileUrl", previousProfilePicture);
+                        await fetch("/api/fileupload", {
+                            method: "DELETE",
+                            body: formData,
+                        });
+                    }
                 }
 
                 setOpenModal(false);
@@ -102,9 +102,11 @@ const PlayerAccountPage: React.FC = () => {
         }
     };
 
-    if (!session || !session.user || !userInfo) {
-        return <div>Loading...</div>; // Handle loading state
+    if (!userInfo) {
+        return <div className="text-white p-10">Loading user data...</div>; // Handle loading state
     }
+
+    console.log("User Info:", userInfo);
 
     return (
         <FadeContent blur={true} duration={1000} easing="ease-out" initialOpacity={0}>

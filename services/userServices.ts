@@ -55,7 +55,7 @@ export async function putUserService(id: number, userDto: UserDto) {
         // Apply updates only to fields that are provided
         // Dynamically construct the update object and exclude undefined or _id fields
         const updateUserData: Partial<IUser> = Object.fromEntries(
-         Object.entries(updateData).filter(([key, value]) => key !== '_id' && value !== undefined && value !== null)
+         Object.entries(updateData).filter(([key, value]) => key !== '_id' && key!=='userId' && value !== undefined && value !== null)
         );
 
         return putUser(id, updateUserData);

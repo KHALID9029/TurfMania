@@ -11,6 +11,7 @@ import SpotlightCard from "@/components/spotlightCard";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
+  console.log("Session Data:", session);
 
   if (status === "loading") return <h1 className="flex justify-center items-center">Loading...</h1>;
   if (!session) return <p>Please sign in.</p>;
@@ -25,7 +26,7 @@ export default function DashboardPage() {
             { label: "Turfs", href: "/browse_turfs" },
             { label: "Dashboard" }, // Will trigger redirect logic
             { label: "Bookings", href: "/bookings" },
-            { label: "Account", href: "/player/account" },
+            { label: "Account", href: `/player/account/${session.user.userId}` },
           ]}
         />
         {/* Welcome Banner */}
