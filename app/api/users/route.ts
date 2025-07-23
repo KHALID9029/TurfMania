@@ -6,7 +6,8 @@ import{
     getUserByIdService,
     postUserService,
     putUserService,
-    deleteUserService
+    deleteUserService,
+    passwordResetService
 } from "@/services/userServices";
 
 
@@ -78,6 +79,20 @@ export async function PUT(req: NextRequest){
     const {searchParams} = new URL(req.url);
     const id = searchParams.get('id');
     const userId = parseInt(id as string) || 0;
+    const isPasswordReset = searchParams.get('resetPassword') === 'true';
+
+    if(isPasswordReset) {
+        const data = await req.formData();
+        const prevPassword = data.get('prevPassword') as string;
+        const newPassword = data.get('newPassword') as string;
+
+        if (!prevPassword || !newPassword) {
+            return NextResponse.json({ error: "Previous and new passwords are required." }, { status: 400 });
+        }
+
+        // Call the service to reset password
+        return passwordResetService(userId,  prevPassword, newPassword );
+    }
 
     const data = await req.formData();
     const playerDto = await parseRequestToPlayerDto(data);

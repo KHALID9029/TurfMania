@@ -15,14 +15,16 @@ import Box from "@mui/material/Box";
 import { CircularProgress } from "@mui/material";
 import { Upload } from "lucide-react";
 import RegistrationForm from "@/components/Forms/registrationForm";
+import ResetPasswordForm from "@/components/Forms/resetPasswordForm";
 
 const PlayerAccountPage: React.FC = () => {
   const { id } = useParams();
   const [userInfo, setUserInfo] = useState<UserDto>();
-  const [openModal, setOpenModal] = useState(false);
+  const [openImageModal, setOpenImageModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [openEditForm, setOpenEditForm] = useState(false);
+  const [openPasswordModal, setOpenPasswordModal] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -94,7 +96,7 @@ const PlayerAccountPage: React.FC = () => {
           }
         }
 
-        setOpenModal(false);
+        setOpenImageModal(false);
         window.location.reload(); // reload to get updated image
       } else {
         console.error("Upload failed:", data);
@@ -143,7 +145,7 @@ const PlayerAccountPage: React.FC = () => {
                 height={120}
               />
               <div
-                onClick={() => setOpenModal(true)}
+                onClick={() => setOpenImageModal(true)}
                 className="absolute -top-[0px] -right-[0px] bg-zinc-700 p-[2px] rounded-full cursor-pointer hover:bg-zinc-600"
               >
                 <Pencil className="w-4 h-4 text-white" />
@@ -195,10 +197,20 @@ const PlayerAccountPage: React.FC = () => {
               {userInfo.city && <Info label="City" value={userInfo.city} />}
             </div>
           </div>
+
+          <div className="flex justify-end mt-6">
+  <button
+    onClick={() => setOpenPasswordModal(true)}
+    className="text-sm bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-md"
+  >
+    Reset your password
+  </button>
+</div>
+
         </div>
 
         {/* Modal for image upload */}
-        <Modal open={openModal} onClose={() => setOpenModal(false)}>
+        <Modal open={openImageModal} onClose={() => setOpenImageModal(false)}>
           <Box className="bg-zinc-900 rounded-lg p-6 m-auto mt-[20vh] w-[90%] max-w-md text-white shadow-lg">
             <h2 className="text-lg font-semibold mb-4">
               Upload New Profile Picture
@@ -247,7 +259,7 @@ const PlayerAccountPage: React.FC = () => {
             <div className="flex justify-end gap-2">
               <button
                 className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded"
-                onClick={() => setOpenModal(false)}
+                onClick={() => setOpenImageModal(false)}
                 disabled={uploading}
               >
                 Cancel
@@ -282,6 +294,17 @@ const PlayerAccountPage: React.FC = () => {
             />
           </Box>
         </Modal>
+
+        <Modal open={openPasswordModal} onClose={() => setOpenPasswordModal(false)}>
+  <Box className="bg-zinc-900 rounded-lg p-6 m-auto mt-[20vh] w-[90%] max-w-md text-white shadow-lg">
+    <h2 className="text-lg font-semibold mb-4">Reset Password</h2>
+    <ResetPasswordForm
+      userId={userInfo.userId}
+      onClose={() => setOpenPasswordModal(false)}
+    />
+  </Box>
+</Modal>
+
       </div>
     </FadeContent>
   );
