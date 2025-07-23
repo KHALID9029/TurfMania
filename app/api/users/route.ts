@@ -6,7 +6,8 @@ import{
     getUserByIdService,
     postUserService,
     putUserService,
-    deleteUserService
+    deleteUserService,
+    passwordResetService
 } from "@/services/userServices";
 
 
@@ -22,7 +23,8 @@ async function parseRequestToPlayerDto(data: FormData) {
         role: data.get('role') as string || 'Player', // Default to 'Player' if not provided
         street: data.get('street') as string,
         postCode: data.get('postCode') as string,
-        city: data.get('city') as string
+        city: data.get('city') as string,
+        profilePicture: data.get('profilePicture') as string // Optional profile picture field
     }
 
     return {
@@ -34,7 +36,8 @@ async function parseRequestToPlayerDto(data: FormData) {
         role: body.role,
         street: body.street,
         postCode: body.postCode,
-        city: body.city
+        city: body.city,
+        profilePicture: body.profilePicture // Optional profile picture field
     }
 }
 
@@ -76,6 +79,20 @@ export async function PUT(req: NextRequest){
     const {searchParams} = new URL(req.url);
     const id = searchParams.get('id');
     const userId = parseInt(id as string) || 0;
+    const isPasswordReset = searchParams.get('resetPassword') === 'true';
+
+    if(isPasswordReset) {
+        const data = await req.formData();
+        const prevPassword = data.get('prevPassword') as string;
+        const newPassword = data.get('newPassword') as string;
+
+        if (!prevPassword || !newPassword) {
+            return NextResponse.json({ error: "Previous and new passwords are required." }, { status: 400 });
+        }
+
+        // Call the service to reset password
+        return passwordResetService(userId,  prevPassword, newPassword );
+    }
 
     const data = await req.formData();
     const playerDto = await parseRequestToPlayerDto(data);

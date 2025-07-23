@@ -61,3 +61,43 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Failed to upload image" }, { status: 500 });
     }
 }
+
+
+export async function DELETE(request: NextRequest) {
+    try{
+        const formData = await request.formData();
+        const fileUrl = formData.get("fileUrl") as string | null;
+
+        if (!fileUrl) {
+            return NextResponse.json({ error: "File URL is required" }, { status: 400 });
+        }
+
+        // Extract public_id from the Cloudinary URL
+    const publicId = fileUrl
+      .split("/")
+      .slice(-1)[0]
+      .split(".")[0]; // assumes last part is filename like xyz.jpg
+
+    const folder = "turfmania/profile_pictures"; // or extract from the URL if needed
+    const fullPublicId = `${folder}/${publicId}`;
+
+    console.log("Deleting file with public ID:", fullPublicId);
+
+        if (!publicId) {
+            return NextResponse.json({ error: "Invalid file URL" }, { status: 400 });
+        }
+        const result = await cloudinary.uploader.destroy(fullPublicId, {
+            invalidate: true,
+            resource_type: "image"
+        });
+        if (result.result === "ok") {
+            return NextResponse.json({ message: "File deleted successfully" }, { status: 200 });
+        } else {
+            console.error("Cloudinary delete error:", result);
+            return NextResponse.json({ error: "Failed to delete file" }, { status: 500 });
+        }
+    }catch (error) {
+        console.error("Error deleting file:", error);
+        return NextResponse.json({ error: "Failed to delete file" }, { status: 500 });
+    }
+}

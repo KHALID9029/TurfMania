@@ -11,7 +11,8 @@ import {
     postUser,
     putUser,
     deleteUser,
-    passCheck
+    passCheck,
+    passwordReset
 } from "@/repositories/userRepository";
 
 export async function getAllUsersService(req: NextRequest) {
@@ -55,7 +56,7 @@ export async function putUserService(id: number, userDto: UserDto) {
         // Apply updates only to fields that are provided
         // Dynamically construct the update object and exclude undefined or _id fields
         const updateUserData: Partial<IUser> = Object.fromEntries(
-         Object.entries(updateData).filter(([key, value]) => key !== '_id' && value !== undefined && value !== null)
+         Object.entries(updateData).filter(([key, value]) => key !== '_id' && key!=='userId' && value !== undefined && value !== null)
         );
 
         return putUser(id, updateUserData);
@@ -94,4 +95,13 @@ export async function passCheckService(password: string, email: string) {
         return NextResponse.json({ error: "Password and user are required" }, { status: 400 });
 
     return passCheck(password, email);
+}
+
+
+export async function passwordResetService(userId: number, prevPassword: string, newPassword: string) {
+    if (!userId || !prevPassword || !newPassword) {
+        return NextResponse.json({ error: "User ID, previous password, and new password are required." }, { status: 400 });
+    }
+
+    return passwordReset(userId, prevPassword, newPassword);
 }

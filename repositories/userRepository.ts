@@ -128,3 +128,37 @@ export async function passCheck(password: string, email: string) {
         return NextResponse.json({ error: "Failed to check password" }, { status: 500 });
     }
 }
+
+
+export async function passwordReset(userId: number, prevPassword: string, newPassword: string) {
+    try{
+        await connectDB();
+        const user = await User.findOne({ userId: userId });
+        
+        if (!user) {
+            return NextResponse.json({ error: "User not found" }, { status: 404 });
+        }
+
+        if (!user.password) {
+            return NextResponse.json({ error: "Password login unavailable for this account" }, { status: 403 });
+        }
+
+        const isPasswordCorrect = await bcrypt.compare(prevPassword, user.password);
+
+        if (!isPasswordCorrect) {
+            return NextResponse.json({ error: "Incorrect previous password" }, { status: 401 });
+        }
+
+        // Hash the new password
+        const hashedNewPassword = await bcrypt.hash(newPassword, 12);
+        user.password = hashedNewPassword;
+
+        const updatedUser = await user.save();
+        const userDto = toUserDto(updatedUser);
+        
+        return NextResponse.json(userDto, { status: 200 });
+    }catch (error) {
+        console.error("Error resetting password:", error);
+        return NextResponse.json({ error: "Failed to reset password" }, { status: 500 });
+    }
+}
