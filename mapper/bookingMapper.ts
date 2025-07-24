@@ -20,7 +20,7 @@ export async function parseRequestToBookingDto(data: FormData) {
         bookingId: data.get('bookingId') as string,
         userId: data.get('userId') as string,
         turfId: data.get('turfId') as string,
-        date: new Date(data.get('date') as string),
+        date: data.get('date') as string,
         startTime: data.get('startTime') as string,
         endTime: data.get('endTime') as string,
         cost: parseFloat(data.get('cost') as string) || 0, // Default to 0 if not provided

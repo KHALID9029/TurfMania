@@ -49,6 +49,18 @@ export async function getAllBookingsByUserId(userId: number) {
     }
 }
 
+export async function getAllBookingsByUserIdDate(userId: number, bookingDate: string) {
+    try {
+        await connectDB();
+        const bookings = await Booking.find({ userId: userId, date: bookingDate }).populate('user').populate('turf');
+        const bookingDtos = bookings.map(booking => toBookingDto(booking));
+        return NextResponse.json(bookingDtos, { status: 200 });
+    } catch (error) {
+        console.error("Error fetching Bookings by User ID and Date:", error);
+        return NextResponse.json({ error: "Failed to fetch Bookings by User ID and Date" }, { status: 500 });
+    }
+}
+
 
 // Get all the bookings of a turf by turfId
 export async function getAllBookingsByTurfId(turfId: number) {
@@ -60,6 +72,18 @@ export async function getAllBookingsByTurfId(turfId: number) {
     } catch (error) {   
         console.error("Error fetching Bookings by Turf ID:", error);
         return NextResponse.json({ error: "Failed to fetch Bookings by Turf ID" }, { status: 500 });
+    }
+}
+
+export async function getAllBookingsByTurfIdDate(turfId: number, bookingDate: string) {
+    try {
+        await connectDB();
+        const bookings = await Booking.find({ turfId: turfId, date: bookingDate }).populate('user').populate('turf');
+        const bookingDtos = bookings.map(booking => toBookingDto(booking));
+        return NextResponse.json(bookingDtos, { status: 200 });
+    } catch (error) {
+        console.error("Error fetching Bookings by Turf ID and Date:", error);
+        return NextResponse.json({ error: "Failed to fetch Bookings by Turf ID and Date" }, { status: 500 });
     }
 }
 

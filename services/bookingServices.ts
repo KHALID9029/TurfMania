@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import BookingDto from "@/dto/bookingDto";
 import { IBooking } from "@/models/Booking";
@@ -7,7 +7,9 @@ import {
     getAllBookings,
     getBookingById,
     getAllBookingsByUserId,
+    getAllBookingsByUserIdDate,
     getAllBookingsByTurfId,
+    getAllBookingsByTurfIdDate,
     postBooking,
     putBooking,
     deleteBooking
@@ -25,18 +27,37 @@ export async function getBookingByIdService(id: number) {
     return getBookingById(id);
 }
 
-export async function getAllBookingsByUserIdService(userId: number) {
+export async function getAllBookingsByUserIdService(userId: number, req: NextRequest) {
+    const { searchParams } = new URL(req.url);
+    const date =searchParams.get('date');
+    const bookingDate = date;
+
     if (!userId) {
         return NextResponse.json({ error: "User ID is required" }, { status: 400 });
     }
-    return getAllBookingsByUserId(userId);
+
+    if( !bookingDate) {
+        return getAllBookingsByUserId(userId);
+    } else {
+        return getAllBookingsByUserIdDate(userId, bookingDate);
+    }
 }
 
-export async function getAllBookingsByTurfIdService(turfId: number) {
+export async function getAllBookingsByTurfIdService(turfId: number, req: NextRequest) {
+
+    const { searchParams } = new URL(req.url);
+    const date = searchParams.get('date');
+    const bookingDate = date;
+
     if (!turfId) {
         return NextResponse.json({ error: "Turf ID is required" }, { status: 400 });
     }
-    return getAllBookingsByTurfId(turfId);
+
+    if( !bookingDate) {
+        return getAllBookingsByTurfId(turfId);
+    } else {
+        return getAllBookingsByTurfIdDate(turfId, bookingDate);
+    }
 }
 
 export async function postBookingService(booking: IBooking) {

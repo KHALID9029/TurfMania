@@ -25,9 +25,9 @@ export async function GET(req: NextRequest) {
     if (id) {
         return getBookingByIdService(parseInt(id));
     } else if (userId) {
-        return getAllBookingsByUserIdService(userId);
+        return getAllBookingsByUserIdService(userId, req);
     } else if (turfId) {
-        return getAllBookingsByTurfIdService(turfId);
+        return getAllBookingsByTurfIdService(turfId, req);
     } else {
         return getAllBookingsService();
     }
@@ -36,7 +36,10 @@ export async function GET(req: NextRequest) {
 /** POST: Create a new booking */
 export async function POST(req: NextRequest) {
     const data = await req.formData();
+    const date = data.get('date') as string;
+    console.log("Date befor parsing:",date);
     const bookingDto = await parseRequestToBookingDto(data);
+    console.log("Date in backend:", bookingDto.date);
     const booking = bookingDto as IBooking;
     if (!bookingDto) {
         return NextResponse.json({ error: "Invalid booking data" }, { status: 400 });

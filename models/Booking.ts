@@ -5,7 +5,7 @@ export interface IBooking extends Document{
     bookingId: number;
     userId: number; // Reference to the user who made the booking
     turfId: number; // Reference to the turf being booked
-    date: Date; // Date of the booking
+    date: string; // Date of the booking
     startTime: string; // Start time of the booking in HH:mm format
     endTime: string; // End time of the booking in HH:mm format
     cost: number; // Cost of the booking
@@ -18,7 +18,7 @@ const BookingSchema: Schema = new Schema(
         bookingId: {type: Number, unique: true}, // Custom auto-increment field for public use
         userId: {type: Number, required: true, ref: 'User'}, // Reference to the user who made the booking
         turfId: {type: Number, required: true, ref: 'Turf'}, // Reference to the turf being booked
-        date: {type: Date, required: true}, // Date of the booking
+        date: {type: String, required: true}, // Date of the booking
         startTime: {type: String, required: true}, // Start time of the booking in HH:mm format
         endTime: {type: String, required: true}, // End time of the booking in HH:mm format
         cost: {type: Number, required: true}, // Cost of the booking

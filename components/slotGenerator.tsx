@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 type TimeSlotProps = {
   open: string;
@@ -55,6 +55,8 @@ const TimeSlots: React.FC<TimeSlotProps> = ({
   const endTime = parseTime(close);
 
   const slots: string[] = [];
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]);
+
   let current = new Date(startTime);
 
   while (current < endTime) {
@@ -63,6 +65,40 @@ const TimeSlots: React.FC<TimeSlotProps> = ({
     slots.push(`${formatTime(current)} - ${formatTime(next)}`);
     current = next;
   }
+
+  useEffect(() => {
+  async function fetchBookings() {
+    try {
+      const res = await fetch(`/api/booking?turfId=${turfId}&date=${date}`);
+      const data = await res.json();
+      console.log(data);
+
+      const disabled: string[] = [];
+
+      data.forEach((booking: { startTime: string; endTime: string }) => {
+  const start = parseTime(booking.startTime);
+  const end = parseTime(booking.endTime);
+  let current = new Date(start);
+
+  while (current < end) {
+    const next = new Date(current.getTime() + 30 * 60 * 1000);
+    if (next > end) break;
+    disabled.push(`${formatTime(current)} - ${formatTime(next)}`);
+    current = next;
+  }
+});
+
+
+      setBookedSlots(disabled);
+    } catch (error) {
+      console.error("Failed to fetch bookings", error);
+    }
+  }
+
+  fetchBookings();
+  console.log("Fetching bookings for turfId:", turfId, "on date:", date);
+  console.log("Booked slots:", bookedSlots);
+}, [turfId, date]);
 
   // To let only select consecutive slots
   const [firstSelectedSlot, setFirstSelectedSlot] = useState<string | null>(null);
@@ -102,14 +138,20 @@ const TimeSlots: React.FC<TimeSlotProps> = ({
         {slots.map((slot, i) => (
           <div
             key={i}
-            onClick={() => toggleSlot(slot)}
-            className={`cursor-pointer rounded p-2 text-center text-[8px] md:text-sm transition 
-      h-10 md:h-15 flex items-center justify-center
-                            ${
-                              selectedSlots.includes(slot)
-                                ? "bg-green-600 text-white"
-                                : "bg-gray-400 text-black hover:bg-gray-500"
-                            }`}
+            onClick={() => {
+    if (!bookedSlots.includes(slot)) {
+      toggleSlot(slot);
+    }
+  }}
+            className={`rounded p-2 text-center text-[8px] md:text-sm transition 
+    h-10 md:h-15 flex items-center justify-center
+    ${
+      bookedSlots.includes(slot)
+        ? "bg-gray-300 text-gray-600 cursor-not-allowed opacity-60"
+        : selectedSlots.includes(slot)
+        ? "bg-green-600 text-white cursor-pointer"
+        : "bg-gray-400 text-black hover:bg-gray-500 cursor-pointer"
+    }`}
           >
             {formatSingleTimeRange(slot)}
           </div>
