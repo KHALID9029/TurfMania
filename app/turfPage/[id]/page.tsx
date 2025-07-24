@@ -2,19 +2,26 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import { MapPin } from "lucide-react";
-import { Star, StarHalf } from "lucide-react";
+import { Star } from "lucide-react";
+import { Modal } from "@mui/material";
+import Box from "@mui/material/Box";
+
+
 import TurfDto from "@/dto/turfDto";
 import TimeSlots from "@/components/slotGenerator";
 import { getFormattedAddress } from "@/lib/utils";
 import DatePickerInput from "@/components/datePicker";
-import { useSession } from "next-auth/react";
 import { Pencil } from "lucide-react";
 import ReviewDto from "@/dto/reviewDto";
 import Stepper, { Step } from "@/components/stepper";
+import toast from "react-hot-toast";
 
-import FadeContent from "@/components/fadeContent";
+// import FadeContent from "@/components/fadeContent";
+// import Navbar from "@/components/bars/navbar"
+
 export default function TurfPage() {
     const { id } = useParams();
     const [turf, setTurf] = useState<TurfDto>();
@@ -39,6 +46,8 @@ export default function TurfPage() {
 
     //This is Not connected to backed yet
     const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
+    const [cost, setCost] = useState(0);
+    const [openPaymentModal, setOpenPaymentModal] = useState(false);
 
     const [showStepper, setShowStepper] = useState(false);
 
@@ -177,6 +186,59 @@ export default function TurfPage() {
             setUserReview(found);
         }
     }, [session, reviews]);
+
+
+    // From 6:00 AM - 6:30 AM get only 6:00 AM
+    // From 6:30 AM - 7:00 AM get only 6:30 AM
+    const handlePayment = async () => {
+        if (!turf || !selectedDate || selectedSlots.length === 0 || !session?.user || turf.rate <= 0) {
+            toast.error("Booking failed: Missing required information");
+            console.error("Booking failed: Missing required information");
+            return;
+        }
+
+        const totalCost = (selectedSlots.length/2) * turf.rate;   
+        setCost(totalCost);
+        setOpenPaymentModal(true);
+        console.log("Cost calculated:", cost);
+    }
+
+    const handleBooking = async () => {
+        if (!turf || !selectedDate || selectedSlots.length === 0 || !session?.user || cost <= 0) {
+            toast.error("Booking failed: Missing required information");
+            console.error("Booking failed: Missing required information");
+            return;
+        }
+        try{
+            const data = new FormData();
+            data.set('turfId', String(turf.turfId));
+            data.set('userId', String(session.user.userId));
+            data.set('date', selectedDate);
+            data.set('startTime', selectedSlots[0].split(" - ")[0].trim());
+            data.set('endTime', selectedSlots[selectedSlots.length - 1].split(" - ")[1].trim());
+            data.set('cost', String(cost)); // Assuming rate is 1000 per hour
+            // Payment gateway add korle than kaj korbo eitar upor
+            data.set('paymentStatus', 'pending'); // Default to pending
+            
+            const response = await fetch('/api/booking', {
+                method: 'POST',
+                body: data,
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                toast.error(errorData?.error || "Failed to register turf");
+                throw new Error("Failed to create booking");
+            }else{
+                toast.success("Booking created successfully!");
+                setOpenPaymentModal(false);
+                window.location.reload(); // Reload to reflect the new booking
+            }
+        }catch (error) {
+            console.error("Error creating booking:", error);
+            toast.error("Failed to create booking");
+        }
+    }
 
 
 
@@ -498,22 +560,57 @@ export default function TurfPage() {
                         <label className="text-sm mt-4 text-white w-full">Select Date:</label>
 
                         <DatePickerInput onDateSelect={handleDateSelect} initialDate={selectedDate} />
-                        <div className="w-full mt-4 ">
-                            <TimeSlots
-                                open={turf.open}
-                                close={turf.close}
-                                selectedSlots={selectedSlots}
-                                setSelectedSlots={setSelectedSlots}
-                            />
+                        <div className="w-full mt-4">
+                            {
+                                selectedDate && (
+                                    <TimeSlots
+                                        open={turf.open}
+                                        close={turf.close}
+                                        selectedSlots={selectedSlots}
+                                        setSelectedSlots={setSelectedSlots}
+                                        turfId={turf.turfId}
+                                        date={selectedDate}
+                                    />
+                                )
+                            }
                         </div>
 
-                        <button className="mt-4 w-full py-2 bg-green-600 rounded hover:bg-green-700">
+                        <button 
+                            onClick={()=>handlePayment()}
+                            className="mt-4 w-full py-2 bg-green-600 rounded hover:bg-green-700">
                             Confirm
                         </button>
                     </div>
                 )
                 }
             </div>
+
+            {/* Model for Payment*/}
+        <Modal open={openPaymentModal} onClose={() => setOpenPaymentModal(false)}>
+          <Box className="bg-zinc-900 rounded-lg p-6 m-auto mt-[20vh] w-[90%] max-w-md text-white shadow-lg overflow-y-auto max-h-[90vh]">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Pay</h2>
+              <button
+                onClick={() => setOpenPaymentModal(false)}
+                className="text-sm text-red-400 hover:text-red-600"
+              >
+                Close
+              </button>
+            </div>
+            <div className="flex justify-between items-center mb-4">
+                <p className="text-sm">Cost: {cost} BDT</p>
+            </div>
+                <div className="flex justify-center mt-4">
+
+                <button
+                    onClick={() => handleBooking()}
+                    className="mt-4 w-full py-2 bg-green-600 rounded hover:bg-green-700"
+                >
+                    Pay Now
+                </button>
+                </div>
+          </Box>
+        </Modal>
         </div >
     );
 }
