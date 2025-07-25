@@ -24,7 +24,7 @@ const UserSchema: Schema = new Schema(
         phone: {type: String, required: false, unique: true},
         nid: {type: String, required: false, unique: true},
         role: {type: String, required: true, enum: ["Player", "Owner"], default: "Player"},
-        password: {type: String},
+        password: {type: String, select: false}, // Password field, not returned in queries by default
         street: {type: String, required: false},
         postCode: {type: String, required: false},
         city: {type: String, required: false},

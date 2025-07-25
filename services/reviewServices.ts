@@ -79,7 +79,7 @@ export async function putReviewService(id: number, reviewDto: ReviewDto) {
         // Apply updates only to fields that are provided
         // Dynamically construct the update object and exclude undefined or _id fields
         const updateReviewData: Partial<IReview> = Object.fromEntries(
-            Object.entries(updateData).filter(([key, value]) => key !== '_id' && value !== undefined && value !== null)
+            Object.entries(updateData).filter(([key, value]) => key !== '_id' && key!=='reviewId' && key!=='turfId' && key!=='userId' && value !== undefined && value !== null)
         );
 
 

@@ -10,7 +10,6 @@ import {
     putTurf,
     deleteTurf,
 } from "@/repositories/turfRepository";
-import turfDto from "@/dto/turfDto";
 
 export async function getAllTurfsService(req: NextRequest) {
     return getAllTurfs(req);
@@ -58,7 +57,7 @@ export async function putTurfService(id: number, turfDto: Partial<ITurf>) {
         // Apply updates only to fields that are provided
         // Dynamically construct the update object and exclude undefined or _id fields
         const updateTurfData: Partial<ITurf> = Object.fromEntries(
-            Object.entries(updateData).filter(([key, value]) => key !== '_id' && value !== undefined && value !== null)
+            Object.entries(updateData).filter(([key, value]) => key !== '_id' && key!=='turfId' && key!=='ownerId' && value !== undefined && value !== null)
         );
         
         return putTurf(id, updateTurfData);
