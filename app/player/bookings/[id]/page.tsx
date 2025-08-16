@@ -13,7 +13,7 @@ const PlayerBookingsPage: React.FC = () => {
     const { id } = useParams();
     const [bookings, setBookings] = useState<BookingDto[]>([]);
     const [loading, setLoading] = useState(true);
-    const [cancelingId, setCancelingId] = useState<number|null>(null);
+    //const [cancelingId, setCancelingId] = useState<number|null>(null);
 
     useEffect(() => {
         if (!id) return;
@@ -42,22 +42,22 @@ const PlayerBookingsPage: React.FC = () => {
     const upcoming = bookings.filter(b => b.date >= today);
     const previous = bookings.filter(b => b.date < today);
 
-    async function handleCancel(bookingId: number) {
-        setCancelingId(bookingId);
-        try {
-            const res = await fetch(`/api/booking?id=${bookingId}`, { method: "DELETE" });
-            if (res.ok) {
-                toast.success("Booking cancelled");
-                setBookings(bookings.filter(b => b.bookingId !== bookingId));
-            } else {
-                toast.error("Failed to cancel booking");
-            }
-        } catch {
-            toast.error("Failed to cancel booking");
-        } finally {
-            setCancelingId(null);
-        }
-    }
+    // async function handleCancel(bookingId: number) {
+    //     setCancelingId(bookingId);
+    //     try {
+    //         const res = await fetch(`/api/booking?id=${bookingId}`, { method: "DELETE" });
+    //         if (res.ok) {
+    //             toast.success("Booking cancelled");
+    //             setBookings(bookings.filter(b => b.bookingId !== bookingId));
+    //         } else {
+    //             toast.error("Failed to cancel booking");
+    //         }
+    //     } catch {
+    //         toast.error("Failed to cancel booking");
+    //     } finally {
+    //         setCancelingId(null);
+    //     }
+    // }
 
     return (
         <FadeContent blur={true} duration={1000} easing="ease-out" initialOpacity={0}>

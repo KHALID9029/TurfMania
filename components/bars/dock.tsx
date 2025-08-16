@@ -92,9 +92,12 @@ function DockItem({
       role="button"
       aria-haspopup="true"
     >
-      {Children.map(children, (child) =>
-        cloneElement(child as React.ReactElement, { isHovered })
-      )}
+      {Children.map(children, (child) => {
+  if ((child as React.ReactElement).type === DockLabel) {
+    return cloneElement(child as React.ReactElement<DockLabelProps>, { isHovered } as Partial<DockLabelProps>);
+  }
+  return child;
+})}
     </motion.div>
   );
 }
@@ -162,6 +165,7 @@ export default function Dock({
 
   const maxHeight = useMemo(
     () => Math.max(dockHeight, magnification + magnification / 2 + 4),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [magnification]
   );
   const heightRow = useTransform(isHovered, [0, 1], [panelHeight, maxHeight]);
