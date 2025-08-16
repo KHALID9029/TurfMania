@@ -18,7 +18,8 @@ import {
   X,
   ChevronsLeft,
   ChevronsRight,
-  UploadIcon
+  UploadIcon,
+  HomeIcon
 } from "lucide-react"
 
 
@@ -36,6 +37,7 @@ const Sidebar = () => {
   const userId = session?.user.userId
 
   const navItems = [
+    { name: "HomePage", icon: <HomeIcon />, href: "/homePage" },
     { name: "Dashboard", icon: <LayoutDashboard />, href: "/owner/dashboard" },
     { name: "My Turfs", icon: <MapPin />, href: "/owner/turfs" },
     { name: "Bookings", icon: <CalendarDays />, href: `/owner/bookings/${userId}` },

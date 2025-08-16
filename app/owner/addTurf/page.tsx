@@ -401,6 +401,7 @@ export default function AddTurf() {
                 <div className="flex flex-wrap gap-2 mb-4">
                   {amenityArray.map((amenity) => (
                     <button
+                      type="button"
                       key={amenity}
                       onClick={() => handleAmenityToggle(amenity)}
                       className={`px-2 py-1 rounded-lg border ${

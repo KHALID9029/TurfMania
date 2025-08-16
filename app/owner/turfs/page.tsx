@@ -80,6 +80,7 @@ export default function Turf() {
                                     amenities={turf.amenities ?? []}
                                     rating={turf.rating?? 0}
                                     rate={turf.rate}
+                                    onClick={() => router.push(`/turfPage/${turf.turfId}`)}
                                 />
                             ))}
                         </div>
