@@ -55,4 +55,11 @@ Contributions are welcome! Please open issues or submit pull requests for improv
 This project is licensed under the MIT License.
 
 ## Future Works
-- [To be added]
+- Edit Turf Details (Owner)
+- Profile settings for the owners
+- Notifications functionalities for both owners and players
+
+## Before Deployment
+- Finish the future work tasks
+- Some remaining issues in the product backlog
+- Test the website throughly
