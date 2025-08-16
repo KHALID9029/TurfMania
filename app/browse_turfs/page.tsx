@@ -1,10 +1,11 @@
 "use client"
 
-import TurfCard from "@/components/turfCard"
 import { useRouter } from "next/navigation"
 import { useRef, useState, useEffect, useMemo } from "react";
-import Navbar from "@/components/bars/navbar"
 import { ChevronLeft, ChevronRight } from "lucide-react";
+
+import TurfCard from "@/components/turfCard"
+import Navbar from "@/components/bars/navbar"
 import FadeContent from "@/components/fadeContent";
 import TurfDto from "@/dto/turfDto";
 
@@ -176,7 +177,7 @@ export default function Turfs() {
             { label: "Turfs", href: "/browse_turfs" },
             { label: "Dashboard" }, // Will trigger redirect logic
             { label: "Bookings", href: "/bookings" },
-            { label: "Account", href: "/player/account" },
+            { label: "Account"}, // Will trigger redirect logic
           ]}
         />
 

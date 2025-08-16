@@ -273,7 +273,10 @@ export default function TurfPage() {
               onStepChange={(step) => {
                 console.log(step);
               }}
-              onFinalStepCompleted={() => setShowStepper(false)}
+              onFinalStepCompleted={() => {
+                setShowStepper(false);
+                handlePayment();
+              }}
               canGoToNextStep={(step) => {
                 if (step === 1) {
                   return selectedDate !== undefined;
@@ -302,6 +305,8 @@ export default function TurfPage() {
                   close={turf.close}
                   selectedSlots={selectedSlots}
                   setSelectedSlots={setSelectedSlots}
+                  turfId={turf.turfId}
+                  date={selectedDate}
                 />
               </Step>
               <Step>

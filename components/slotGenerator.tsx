@@ -75,19 +75,45 @@ const TimeSlots: React.FC<TimeSlotProps> = ({
 
       const disabled: string[] = [];
 
+      const now = new Date();
+      const isToday =
+        new Date(date).toDateString() === new Date().toDateString();
+
       data.forEach((booking: { startTime: string; endTime: string }) => {
-  const start = parseTime(booking.startTime);
-  const end = parseTime(booking.endTime);
-  let current = new Date(start);
+        const start = parseTime(booking.startTime);
+        const end = parseTime(booking.endTime);
+        let current = new Date(start);
 
-  while (current < end) {
-    const next = new Date(current.getTime() + 30 * 60 * 1000);
-    if (next > end) break;
-    disabled.push(`${formatTime(current)} - ${formatTime(next)}`);
-    current = next;
-  }
-});
+        while (current < end) {
+          const next = new Date(current.getTime() + 30 * 60 * 1000);
+          if (next > end) break;
 
+          // If today, skip times that have already passed
+          if (!isToday || next > now) {
+            disabled.push(`${formatTime(current)} - ${formatTime(next)}`);
+          }
+
+          current = next;
+        }
+      });
+
+      // Also block past slots for today that are not part of any booking
+      if (isToday) {
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+        let current = new Date(startOfDay);
+
+        while (current < now) {
+          const next = new Date(current.getTime() + 30 * 60 * 1000);
+          if (next <= now) {
+            const slot = `${formatTime(current)} - ${formatTime(next)}`;
+            if (!disabled.includes(slot)) {
+              disabled.push(slot);
+            }
+          }
+          current = next;
+        }
+      }
 
       setBookedSlots(disabled);
     } catch (error) {
@@ -99,6 +125,7 @@ const TimeSlots: React.FC<TimeSlotProps> = ({
   console.log("Fetching bookings for turfId:", turfId, "on date:", date);
   console.log("Booked slots:", bookedSlots);
 }, [turfId, date]);
+
 
   // To let only select consecutive slots
   const [firstSelectedSlot, setFirstSelectedSlot] = useState<string | null>(null);

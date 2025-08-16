@@ -25,10 +25,22 @@ export const Navbar: FC<NavbarProps> = ({ activePage, navItems }): ReactElement 
     if (!session) {
       toast.error("You need to log in to access the dashboard.");
       router.push("/login");
-    } else if (session?.user?.role === "Owner") {
+    } else if (session.user.role === "Owner") {
       router.push("/owner/dashboard");
     } else {
       router.push("/player/dashboard");
+    }
+  };
+
+  const handleAccountRedirect = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if(!session){
+      toast.error("You need to log in to access account page");
+      router.push("/login");
+    }else if(session.user.role === "Owner"){
+      router.push(`/owner/account/${session.user.userId}`)
+    }else{
+      router.push(`/player/account/${session.user.userId}`);
     }
   };
 
@@ -48,7 +60,7 @@ export const Navbar: FC<NavbarProps> = ({ activePage, navItems }): ReactElement 
               activePage === item.label ? activeClass : inactiveClass
             }
             onClick={
-              item.label === "Dashboard" ? handleDashboardRedirect : undefined
+              item.label === "Dashboard" ? handleDashboardRedirect : item.label === "Account"? handleAccountRedirect : undefined
             }
           >
             {item.href ? (
