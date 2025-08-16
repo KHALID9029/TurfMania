@@ -25,7 +25,7 @@ export default function DashboardPage() {
             { label: "Home", href: "/homePage" },
             { label: "Turfs", href: "/browse_turfs" },
             { label: "Dashboard" }, // Will trigger redirect logic
-            { label: "Bookings", href: "/bookings" },
+            { label: "Bookings"},   // Will trigger redirect logic
             { label: "Account" },
           ]}
         />

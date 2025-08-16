@@ -44,6 +44,16 @@ export const Navbar: FC<NavbarProps> = ({ activePage, navItems }): ReactElement 
     }
   };
 
+  const handleBookingsRedirect = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!session) {
+      toast.error("You need to log in to access bookings.");
+      router.push("/login");
+    } else {
+      router.push(`/player/bookings/${session.user.userId}`);
+    }
+  };
+
   const activeClass =
     "text-cyan-400 [text-shadow:0_0_5px_#22d3ee,0_0_10px_#22d3ee,0_0_20px_#22d3ee]";
   const inactiveClass = "hover:text-cyan-400";
@@ -60,7 +70,9 @@ export const Navbar: FC<NavbarProps> = ({ activePage, navItems }): ReactElement 
               activePage === item.label ? activeClass : inactiveClass
             }
             onClick={
-              item.label === "Dashboard" ? handleDashboardRedirect : item.label === "Account"? handleAccountRedirect : undefined
+              item.label === "Dashboard" ? handleDashboardRedirect : 
+              item.label === "Account"? handleAccountRedirect : 
+              item.label === "Bookings"? handleBookingsRedirect : undefined
             }
           >
             {item.href ? (

@@ -128,7 +128,7 @@ const PlayerAccountPage: React.FC = () => {
             { label: "Home", href: "/homePage" },
             { label: "Turfs", href: "/browse_turfs" },
             { label: "Dashboard" }, // Will trigger redirect logic
-            { label: "Bookings", href: "/bookings" },
+            { label: "Bookings"}, // will trigger redirect logic
             { label: "Account", href: "/player/account" },
           ]}
         />
