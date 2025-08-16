@@ -21,12 +21,6 @@ import {
 } from "lucide-react"
 
 
-const navItems = [
-  { name: "Dashboard", icon: <LayoutDashboard />, href: "/owner/dashboard" },
-  { name: "My Turfs", icon: <MapPin />, href: "/owner/turfs" },
-  { name: "Bookings", icon: <CalendarDays />, href: "/owner/bookings" },
-    { name: "List turf", icon: <UploadIcon />, href: "/owner/addTurf" },
-]
 
 const others = [
   { name: "Notifications", icon: <Bell />, href: "/owner/notifications" },
@@ -38,6 +32,14 @@ const Sidebar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [expanded, setExpanded] = useState(true)
   const { data: session } = useSession()
+  const userId = session?.user.userId
+
+  const navItems = [
+    { name: "Dashboard", icon: <LayoutDashboard />, href: "/owner/dashboard" },
+    { name: "My Turfs", icon: <MapPin />, href: "/owner/turfs" },
+    { name: "Bookings", icon: <CalendarDays />, href: `/owner/bookings/${userId}` },
+    { name: "List turf", icon: <UploadIcon />, href: "/owner/addTurf" },
+  ]
 
   return (
     <>

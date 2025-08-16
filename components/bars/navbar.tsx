@@ -1,10 +1,11 @@
 "use client";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { Bell } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FC, ReactElement } from "react";
 import toast from "react-hot-toast";
+import { LogOut } from "lucide-react";
 
 interface NavItem {
   label: string;
@@ -92,7 +93,21 @@ export const Navbar: FC<NavbarProps> = ({ activePage, navItems }): ReactElement 
         </Link>
       )}
 
-      {session && (
+      {session && activePage === "Dashboard" ? (
+        <div className="absolute right-20 flex items-center gap-4">
+          <Link href="/player/notifications">
+            <Bell className="cursor-pointer" />
+          </Link>
+          <button
+            onClick={() => signOut({ callbackUrl: "/homePage" })}
+            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+            title="Log Out"
+          >
+            <LogOut size={20} />
+            Log Out
+          </button>
+        </div>
+      ) : session && (
         <Link href="/player/notifications" className="absolute right-10">
           <Bell />
         </Link>
