@@ -26,7 +26,7 @@ export default function DashboardPage() {
             { label: "Turfs", href: "/browse_turfs" },
             { label: "Dashboard" }, // Will trigger redirect logic
             { label: "Bookings", href: "/bookings" },
-            { label: "Account", href: `/player/account/${session.user.userId}` },
+            { label: "Account" },
           ]}
         />
         {/* Welcome Banner */}
