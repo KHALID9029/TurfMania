@@ -17,7 +17,9 @@ export const authOptions: NextAuthOptions = {
         await connectDB();
         if (!credentials?.email || !credentials.password) throw new Error("Missing credentials");
 
-        const user = await User.findOne({ email: credentials.email });
+        const user = await User.findOne({ email: credentials.email }).select("+password");
+
+        console.log("User found:", user);
         if (!user) throw new Error("No user found");
 
         if (!user.password) throw new Error("Password login unavailable for this account");

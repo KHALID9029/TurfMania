@@ -1,10 +1,11 @@
 "use client";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { Bell } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FC, ReactElement } from "react";
 import toast from "react-hot-toast";
+import { LogOut } from "lucide-react";
 
 interface NavItem {
   label: string;
@@ -44,6 +45,16 @@ export const Navbar: FC<NavbarProps> = ({ activePage, navItems }): ReactElement 
     }
   };
 
+  const handleBookingsRedirect = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!session) {
+      toast.error("You need to log in to access bookings.");
+      router.push("/login");
+    } else {
+      router.push(`/player/bookings/${session.user.userId}`);
+    }
+  };
+
   const activeClass =
     "text-cyan-400 [text-shadow:0_0_5px_#22d3ee,0_0_10px_#22d3ee,0_0_20px_#22d3ee]";
   const inactiveClass = "hover:text-cyan-400";
@@ -60,7 +71,9 @@ export const Navbar: FC<NavbarProps> = ({ activePage, navItems }): ReactElement 
               activePage === item.label ? activeClass : inactiveClass
             }
             onClick={
-              item.label === "Dashboard" ? handleDashboardRedirect : item.label === "Account"? handleAccountRedirect : undefined
+              item.label === "Dashboard" ? handleDashboardRedirect : 
+              item.label === "Account"? handleAccountRedirect : 
+              item.label === "Bookings"? handleBookingsRedirect : undefined
             }
           >
             {item.href ? (
@@ -80,7 +93,21 @@ export const Navbar: FC<NavbarProps> = ({ activePage, navItems }): ReactElement 
         </Link>
       )}
 
-      {session && (
+      {session && activePage === "Dashboard" ? (
+        <div className="absolute right-20 flex items-center gap-4">
+          <Link href="/player/notifications">
+            <Bell className="cursor-pointer" />
+          </Link>
+          <button
+            onClick={() => signOut({ callbackUrl: "/homePage" })}
+            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+            title="Log Out"
+          >
+            <LogOut size={20} />
+            Log Out
+          </button>
+        </div>
+      ) : session && (
         <Link href="/player/notifications" className="absolute right-10">
           <Bell />
         </Link>
