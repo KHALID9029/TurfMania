@@ -48,6 +48,9 @@ TurfMania is a modern web application for booking and managing sports turfs. Bui
 ## Deployment
 Deploy easily on [Vercel](https://vercel.com/) or your preferred platform. See Next.js documentation for more details.
 
+## Skip all that trouble??
+Just want to test the site without going through all that trouble? We have got you covered, visit: [Demo](https://turf-mania.vercel.app/) for a first-hand experience.
+
 ## Contributing
 Contributions are welcome! Please open issues or submit pull requests for improvements and bug fixes.
 
