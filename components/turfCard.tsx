@@ -1,5 +1,6 @@
 import { MapPin } from "lucide-react";
 import FadeContent from "./fadeContent";
+import Image from "next/image";
 type TurfProps = {
   name: string;
   location: string;
@@ -20,7 +21,13 @@ const TurfCard = ({ name, location, imageUrl, amenities, rating, rate,onClick }:
     onClick={onClick}
      className="bg-[#2a2a2a] rounded-xl overflow-hidden shadow-md hover:scale-105 transition-transform duration-300 flex flex-col h-full">
   <FadeContent blur={true} duration={1000} easing="ease-out" initialOpacity={0}>
-    <img src={imageUrl} alt={name} className="w-full h-48 object-cover" />
+    <Image
+      src={imageUrl}
+      alt={name}
+      className="w-full h-48 object-cover"
+      width={400}
+      height={300}
+    />
     <div className="p-4 text-white flex flex-col flex-grow">
       
       {/* Header */}

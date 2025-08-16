@@ -85,6 +85,7 @@ export default function Turfs() {
   const [searchQuery, setSearchQuery] = useState("");
   const [turfs, setTurfs] = useState<TurfDto[]>([]);
   const [loading, setLoading] = useState(true);
+  console.log(loading);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   useEffect(() => {
     async function fetchTurfs() {

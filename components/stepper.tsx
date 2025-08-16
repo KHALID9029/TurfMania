@@ -117,6 +117,7 @@ export default function Stepper({
                                     renderStepIndicator({
                                         step: stepNumber,
                                         currentStep,
+                                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                         onStepClick: (clicked) => {
                                         
                                         },
@@ -126,6 +127,7 @@ export default function Stepper({
                                         step={stepNumber}
                                         disableStepIndicators={disableStepIndicators}
                                         currentStep={currentStep}
+                                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                         onClickStep={(clicked) => {
                                        
                                            
@@ -356,7 +358,7 @@ function StepConnector({ isComplete }: StepConnectorProps) {
     );
 }
 
-interface CheckIconProps extends React.SVGProps<SVGSVGElement> { }
+type CheckIconProps = React.SVGProps<SVGSVGElement>
 
 function CheckIcon(props: CheckIconProps) {
     return (

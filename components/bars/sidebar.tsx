@@ -6,6 +6,7 @@ import clsx from "clsx"
 import { useState } from "react"
 import { useSession } from "next-auth/react"
 import { signOut } from "next-auth/react";
+import Image from "next/image"
 import {
   LayoutDashboard,
   MapPin,
@@ -17,7 +18,8 @@ import {
   X,
   ChevronsLeft,
   ChevronsRight,
-  UploadIcon
+  UploadIcon,
+  HomeIcon
 } from "lucide-react"
 
 
@@ -35,6 +37,7 @@ const Sidebar = () => {
   const userId = session?.user.userId
 
   const navItems = [
+    { name: "HomePage", icon: <HomeIcon />, href: "/homePage" },
     { name: "Dashboard", icon: <LayoutDashboard />, href: "/owner/dashboard" },
     { name: "My Turfs", icon: <MapPin />, href: "/owner/turfs" },
     { name: "Bookings", icon: <CalendarDays />, href: `/owner/bookings/${userId}` },
@@ -62,7 +65,13 @@ const Sidebar = () => {
           </div>
           <div className="flex space-between items-center mb-6">
             {/* <div className="w-16 h-16 bg-red-600 rounded-full" /> */}
-            <img src="/images/turf3.jpg" className={clsx(expanded && "md:w-20 md:h-20 bg-transparent rounded-full","w-12 h-12 bg-transparent rounded-full" )} />
+            <Image
+              src="/images/turf3.jpg"
+              alt="User Avatar"
+              className={clsx(expanded && "md:w-20 md:h-20 bg-transparent rounded-full","w-12 h-12 bg-transparent rounded-full" )}
+              width={80}
+              height={80}
+            />
           </div>
            {expanded && <h6 className="text-sm pl-2 mb-4">{session?.user.name}</h6>}
 

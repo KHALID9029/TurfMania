@@ -13,6 +13,7 @@ type TimeSlotProps = {
 
 function parseTime(timeStr: string): Date {
   const [time, modifier] = timeStr.split(" ");
+  // eslint-disable-next-line prefer-const
   let [hours, minutes] = time.split(":").map(Number);
   if (modifier === "PM" && hours !== 12) hours += 12;
   if (modifier === "AM" && hours === 12) hours = 0;
@@ -124,6 +125,7 @@ const TimeSlots: React.FC<TimeSlotProps> = ({
   fetchBookings();
   console.log("Fetching bookings for turfId:", turfId, "on date:", date);
   console.log("Booked slots:", bookedSlots);
+// eslint-disable-next-line react-hooks/exhaustive-deps
 }, [turfId, date]);
 
 

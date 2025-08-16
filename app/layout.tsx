@@ -1,13 +1,13 @@
 import type { Metadata , Viewport } from "next";
 import { Toaster } from "react-hot-toast";
-import { Geist, Geist_Mono,Lexend_Mega } from "next/font/google";
+import { Geist_Mono,Lexend_Mega } from "next/font/google";
 import "./globals.css";
 import SessionWrapper from "./sessionWrapper";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+// const geistSans = Geist({
+//   variable: "--font-geist-sans",
+//   subsets: ["latin"],
+// });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
