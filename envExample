@@ -1,0 +1,17 @@
+// For mongoDB connection
+MONGO_URI="Your-Mongo-URL" 
+
+// For NextAuth.js
+NEXTAUTH_SECRET="Your-NextAuth-Secret"
+
+// For google logIn
+GOOGLE_CLIENT_ID="Your-Google-Client-ID"
+GOOGLE_CLIENT_SECRET="Your-Google-Client-Secret"
+
+// For cloudinary
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=Your-Cloudinary-Cloud-Name
+CLOUDINARY_API_KEY=Your-Cloudinary-API-Key
+CLOUDINARY_API_SECRET=Your-Cloudinary-API-Secret
+
+// For Google Maps API
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="Your-Google-Maps-API-Key"
